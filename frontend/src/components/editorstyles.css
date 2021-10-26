@@ -1,0 +1,23 @@
+.editor-modal {
+  width: 95vw;
+  max-width: 1000px;
+}
+
+.form-group {
+  margin-top: 8px;
+}
+
+.mkb-code,
+.title {
+  opacity: 1;
+  -webkit-transition: opacity 0.3s linear;
+  -moz-transition: opacity 0.3s linear;
+  -ms-transition: opacity 0.3s linear;
+  -o-transition: opacity 0.3s linear;
+  transition: opacity 0.3s linear;
+}
+
+.mkb-code-fade,
+.title-fade {
+  opacity: 0;
+}

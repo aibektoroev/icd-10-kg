@@ -1,0 +1,54 @@
+@import "~bootstrap/scss/bootstrap";
+
+html {
+  scroll-behavior: smooth;
+}
+
+#wrapper {
+  margin: 0 auto;
+  padding-top: 65px;
+  padding-bottom: 1rem;
+  max-width: 1080px;
+}
+
+a.anchor {
+  visibility: hidden;
+}
+
+:target {
+  scroll-margin-top: 109px;
+}
+
+pre {
+  white-space: pre-wrap;
+}
+
+a {
+  color: #0269ca;
+}
+
+ol {
+  list-style: decimal outside;
+}
+
+ol > li::before {
+  margin-top: 0.54em;
+  font-size: 0.9em;
+  text-align: right;
+  position: absolute;
+  display: block;
+  width: 20px;
+}
+
+.flexbox-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.badge-edit {
+  background-color: #ffea00;
+}
