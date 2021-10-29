@@ -2,13 +2,14 @@
   display: flex;
   border-radius: 3px;
   overflow: hidden;
+  margin: 0px 0px 0px 15px;
 }
 
 .searchBar input {
   background-color: white;
   color: rgb(55, 55, 55);
   height: 30px;
-  width: 300px;
+  width: 293px;
   font-size: 16px;
   border: 0;
 }
