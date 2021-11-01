@@ -3,7 +3,7 @@ import EmbeddedLink from "./EmbeddedLink";
 import "./mkb_item.css";
 
 export default function MKBItem(props) {
-  const [isEditMode, setEditMode] = useState(true);
+  const [isEditMode, setEditMode] = useState(false);
 
   const parseLinksInText = (text) => {
     if (text.length < 4) return text;

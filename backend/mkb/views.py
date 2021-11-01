@@ -15,7 +15,7 @@ class FilterByParent(viewsets.ModelViewSet):
 
     def list(self, request):
 
-        parents = [{ "id": 0, "mkb_code": "КЛАССЫ МКБ-10" }]
+        parents = [{ "id": 0, "mkb_code": "МКБ-10" }]
 
         parent = int(request.query_params.get('parent'))
 

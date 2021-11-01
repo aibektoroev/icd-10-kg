@@ -15,7 +15,7 @@ const makeRequestCreator = () => {
     let results = [];
     try {
       results = await axios.get(
-        `http://localhost:8000/api/livesearch?search=${keyword}`,
+        process.env.REACT_APP_API_URL + `livesearch?search=${keyword}`,
 
         { cancelToken: cancelToken.token } //Pass the cancel token to the current request
       );

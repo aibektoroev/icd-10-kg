@@ -7,11 +7,9 @@ import axios from "axios";
 import Swal from "sweetalert2";
 
 function MKBList() {
-  const [isEditMode, setEditMode] = useState(true);
+  const [isEditMode, setEditMode] = useState(false);
 
-  const [nodes, setTreeNodes] = useState([
-    { id: 0, mkb_code: "КЛАССЫ МКБ-10" },
-  ]);
+  const [nodes, setTreeNodes] = useState([{ id: 0, mkb_code: "МКБ-10" }]);
 
   const [items, setItems] = useState([]);
 
@@ -59,7 +57,7 @@ function MKBList() {
     // if (parent === currentParent) return;   // TEST THIS LATER !!!
 
     await axios
-      .get("http://localhost:8000/api/filterbyparent", {
+      .get(process.env.REACT_APP_API_URL + "filterbyparent", {
         params: { parent: parent },
       })
       .then((res) => {
@@ -108,7 +106,7 @@ function MKBList() {
     let parent = null;
 
     await axios
-      .get("http://localhost:8000/api/getparentbycode", {
+      .get(process.env.REACT_APP_API_URL + "getparentbycode", {
         params: { mkb_code: link },
       })
       .then((res) => {
@@ -187,7 +185,10 @@ function MKBList() {
     if (editItem.id) {
       // if existing item then update (PUT)
       axios
-        .put(`http://localhost:8000/api/records/${editItem.id}/`, editItem)
+        .put(
+          process.env.REACT_APP_API_URL + `records/${editItem.id}/`,
+          editItem
+        )
         .then((res) => {
           refreshItems(editItem.parent);
         })
@@ -204,7 +205,7 @@ function MKBList() {
     } else {
       // if new item then create (POST)
       axios
-        .post("http://localhost:8000/api/records/", editItem)
+        .post(process.env.REACT_APP_API_URL + "records/", editItem)
         .then((res) => {
           refreshItems(editItem.parent);
         })
@@ -231,7 +232,7 @@ function MKBList() {
 
   const navTreeStyles = {
     top: "56px",
-    padding: "15px 8px 0",
+    padding: "12px 5px",
     maxWidth: "1080px",
     marginLeft: "auto",
     marginRight: "auto",

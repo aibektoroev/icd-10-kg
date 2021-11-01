@@ -17,10 +17,7 @@ export default function NavTree(props) {
   };
 
   return (
-    <div
-      className="justify-content-between ms-4"
-      style={{ fontSize: "18.5px" }}
-    >
+    <div className="justify-content-between ms-4" style={{ fontSize: "17px" }}>
       {generatedNodes(props.nodes).reduce((prev, curr) => [
         prev,
         <span key={"delimiter_" + prev.key} className="mx-1">

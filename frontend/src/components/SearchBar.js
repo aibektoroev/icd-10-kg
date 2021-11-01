@@ -33,10 +33,24 @@ function SearchBar(props) {
 
     search(keyword)
       .then((res) => {
-        setSearchResults(res.data);
+        if (res.data) setSearchResults(res.data);
+        else setSearchResults([]);
       })
-      .catch((error) => {
-        console.log(error.response.data.error);
+      .catch(function (error) {
+        if (error.response) {
+          // Request made and server responded
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          // The request was made but no response was received
+          console.log(error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.log("Error", error.message);
+
+          console.log("Search results is : " + searchResults);
+        }
       });
   }
 
@@ -61,7 +75,8 @@ function SearchBar(props) {
   function showSearchResults() {
     setInputGotFocus(true);
 
-    let displayProp = searchResults.length > 0 ? "block" : "none";
+    let displayProp =
+      searchResults && searchResults.length > 0 ? "block" : "none";
 
     document.getElementById("listSearchResults").style.display = displayProp;
   }
