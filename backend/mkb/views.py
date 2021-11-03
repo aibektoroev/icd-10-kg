@@ -1,5 +1,3 @@
-from django.db.models import query
-from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import viewsets
@@ -15,7 +13,7 @@ class FilterByParent(viewsets.ModelViewSet):
 
     def list(self, request):
 
-        parents = [{ "id": 0, "mkb_code": "МКБ-10" }]
+        parents = [{ "id": 0, "mkb_code": "МКБ-10", "title": "Классы" }]
 
         parent = int(request.query_params.get('parent'))
 
@@ -23,7 +21,7 @@ class FilterByParent(viewsets.ModelViewSet):
 
         while parent:
             parent_record = MKBRecord.records.get(id=parent)
-            parents.insert(1, {"id": parent_record.id, "mkb_code": parent_record.mkb_code})
+            parents.insert(1, {"id": parent_record.id, "mkb_code": parent_record.mkb_code, "title": parent_record.title})
             parent = parent_record.parent            
        
         return Response(data={"parents": parents,
@@ -39,9 +37,11 @@ class ParentByCode(viewsets.ModelViewSet):
 
         processed_code = None
         target_record = None
+        parent = None
 
         try:
             target_record = MKBRecord.records.get(mkb_code=code)
+            parent = MKBRecord.records.get(id=target_record.parent)
 
         except MKBRecord.DoesNotExist:
             if '-' in code:
@@ -49,6 +49,7 @@ class ParentByCode(viewsets.ModelViewSet):
 
                 try:
                     target_record = MKBRecord.records.get(mkb_code=code)
+                    parent = MKBRecord.records.get(id=target_record.parent)
 
                 except MKBRecord.DoesNotExist:
                     pass          
@@ -57,9 +58,11 @@ class ParentByCode(viewsets.ModelViewSet):
             return Response(data= {"status": 204, "message": "The provided link points to no data or is of wrong format..."}, status=status.HTTP_204_NO_CONTENT)
 
         processed_code = target_record.mkb_code
+
+        parent = { "id": parent.id, "mkb_code": parent.mkb_code, "title": parent.title }
             
         return Response(data={"processed_code": processed_code,
-                            "parent": target_record.parent},
+                            "parent": parent},
                             status=status.HTTP_200_OK)
 
         

@@ -7,9 +7,11 @@ import axios from "axios";
 import Swal from "sweetalert2";
 
 function MKBList() {
+  const rootParent = { id: 0, mkb_code: "МКБ-10", title: "Классы" };
+
   const [isEditMode, setEditMode] = useState(false);
 
-  const [nodes, setTreeNodes] = useState([{ id: 0, mkb_code: "МКБ-10" }]);
+  const [nodes, setTreeNodes] = useState([rootParent]);
 
   const [items, setItems] = useState([]);
 
@@ -36,7 +38,7 @@ function MKBList() {
       sessionStorage.removeItem("scrollPosition");
     }
 
-    console.log("Scrolled back to last postition !!!!!!!!!!!!!");
+    console.log("Scrolled back to last postition...");
   };
 
   function sleep(ms) {
@@ -58,7 +60,7 @@ function MKBList() {
 
     await axios
       .get(process.env.REACT_APP_API_URL + "filterbyparent", {
-        params: { parent: parent },
+        params: { parent: parent.id },
       })
       .then((res) => {
         setTreeNodes(res.data.parents);
@@ -71,9 +73,9 @@ function MKBList() {
 
   useEffect(() => {
     const loadInitialData = async () => {
-      await refreshItems(0);
+      await refreshItems(rootParent);
 
-      jumpto("top");
+      jumpto("top-pos");
     };
 
     loadInitialData();
@@ -86,16 +88,18 @@ function MKBList() {
       return;
     }
 
-    await refreshItems(selectedItem.id).then(() => {
-      jumpto("top");
+    await refreshItems(selectedItem).then(() => {
+      jumpto("top-pos");
+      const element = document.getElementById("top-pos");
+      element.scrollIntoView({ behavior: "smooth" });
     });
   }
 
-  async function treeNodeClickedHandler(e, node_id) {
+  async function treeNodeClickedHandler(e, node) {
     e.preventDefault();
 
-    await refreshItems(node_id).then(() => {
-      jumpto("top");
+    await refreshItems(node).then(() => {
+      jumpto("top-pos");
     });
   }
 
@@ -190,7 +194,7 @@ function MKBList() {
           editItem
         )
         .then((res) => {
-          refreshItems(editItem.parent);
+          refreshItems(currentParent); //editItem.parent);
         })
         .then(() => {
           scrollToLastPosition();
@@ -207,7 +211,7 @@ function MKBList() {
       axios
         .post(process.env.REACT_APP_API_URL + "records/", editItem)
         .then((res) => {
-          refreshItems(editItem.parent);
+          refreshItems(currentParent); //editItem.parent);
         })
         .then(() => {
           scrollToLastPosition();
@@ -230,6 +234,7 @@ function MKBList() {
 
   //#endregion
 
+  /*
   const navTreeStyles = {
     top: "56px",
     padding: "12px 5px",
@@ -240,37 +245,33 @@ function MKBList() {
     backgroundColor: "rgba(255, 255, 255, 1)",
     zIndex: 99,
   };
+  */
 
   return (
     <>
       <NavBar searchItemClickedHandler={handleSearchItemClicked} />
 
-      <div
-        className="d-flex fixed-top justify-content-between"
-        style={navTreeStyles}
-      >
-        <NavTree
-          nodes={nodes}
-          onTreeNodeClicked={treeNodeClickedHandler}
-          className="d-inline-block ms-0 ps-0"
-        />
-        {isEditMode ? (
-          <span
-            className="badge text-dark cursor-pointer d-inline-block py-2 me-1"
-            onClick={handleAddItem}
-            style={{ backgroundColor: "#7CFC00" }}
-          >
-            Добавить
-          </span>
-        ) : null}
-      </div>
+      <NavTree
+        parent={currentParent}
+        nodes={nodes}
+        onTreeNodeClicked={treeNodeClickedHandler}
+      />
 
-      <ol
-        className="list-group list-group-numbered"
-        style={{ marginTop: "45px" }}
-      >
+      <a id="top-pos" className="anchor" href="/#" />
+
+      {isEditMode ? (
+        <span
+          className="badge text-dark cursor-pointer d-inline-block py-2 me-1"
+          onClick={handleAddItem}
+          style={{ backgroundColor: "#7CFC00" }}
+        >
+          Добавить
+        </span>
+      ) : null}
+
+      <ol className="list-group list-group-numbered">
         {/* eslint-disable-next-line */}
-        <a id="top" className="anchor" href="/#" />
+
         {items.map((item) => (
           <li
             key={item.id}

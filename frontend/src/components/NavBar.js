@@ -12,16 +12,18 @@ export default function NavBar(props) {
   };
 
   return (
-    <nav className="navbar navbar-dark navbar-expand-lg fixed-top justify-content-between mb-2">
-      <a className="navbar-brand ms-3 me-auto" href="/#">
-        Справочник МКБ-10 для Кыргызстана
-      </a>
-      <SearchBar searchItemClickedHandler={props.searchItemClickedHandler} />
-      <small>
-        <a href="/#" onClick={onLoginClicked} className="text-light mx-3">
-          Войти
+    <nav className="navbar navbar-dark navbar-expand-lg fixed-top">
+      <div class="container-fluid justify-content-end container-contents">
+        <a className="navbar-brand ms-3 me-auto" href="/#">
+          Справочник МКБ-10 для Кыргызстана
         </a>
-      </small>
+        <SearchBar searchItemClickedHandler={props.searchItemClickedHandler} />
+        <small>
+          <a href="/#" onClick={onLoginClicked} className="text-light mx-3">
+            Войти
+          </a>
+        </small>
+      </div>
     </nav>
   );
 }

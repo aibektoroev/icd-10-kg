@@ -6,7 +6,7 @@ html {
 
 #wrapper {
   margin: 0 auto;
-  padding-top: 65px;
+  padding-top: 56px;
   padding-bottom: 1rem;
   max-width: 1080px;
 }
@@ -16,7 +16,7 @@ a.anchor {
 }
 
 :target {
-  scroll-margin-top: 109px;
+  scroll-margin-top: 140px;
 }
 
 pre {
@@ -24,7 +24,7 @@ pre {
 }
 
 a {
-  color: #1d8acb;
+  color: #1186ca;
 }
 
 ol {
@@ -33,7 +33,7 @@ ol {
 
 ol > li::before {
   margin-top: 0.54em;
-  font-size: 0.9em;
+  font-size: 0.85em;
   text-align: right;
   position: absolute;
   display: block;

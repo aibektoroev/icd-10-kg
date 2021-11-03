@@ -14,14 +14,9 @@ function SearchBar(props) {
   const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
-    const timeOutId = setTimeout(() => handleSearch(inputText), 300);
+    const timeOutId = setTimeout(() => handleSearch(inputText), 150);
     return () => clearTimeout(timeOutId);
   }, [inputText]);
-
-  useEffect(() => {
-    showSearchResults();
-    // eslint-disable-next-line
-  }, [searchResults]);
 
   // Search functionality
   async function handleSearch(keyword) {
@@ -33,8 +28,10 @@ function SearchBar(props) {
 
     search(keyword)
       .then((res) => {
-        if (res.data) setSearchResults(res.data);
-        else setSearchResults([]);
+        if (res.data) {
+          setSearchResults(res.data);
+          showSearchResults();
+        } //else setSearchResults([]);
       })
       .catch(function (error) {
         if (error.response) {
@@ -70,15 +67,14 @@ function SearchBar(props) {
     e.preventDefault();
 
     setInputText("");
+
+    document.getElementById("searchInput").focus();
   }
 
   function showSearchResults() {
     setInputGotFocus(true);
 
-    let displayProp =
-      searchResults && searchResults.length > 0 ? "block" : "none";
-
-    document.getElementById("listSearchResults").style.display = displayProp;
+    document.getElementById("listSearchResults").style.display = "block";
   }
 
   const hideSearchResults = () => {
@@ -92,6 +88,7 @@ function SearchBar(props) {
       <div className="searchBar">
         <div className="searchField">
           <input
+            id="searchInput"
             type="text"
             value={inputText}
             placeholder="Код или наименование"

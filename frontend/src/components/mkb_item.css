@@ -1,5 +1,5 @@
 .mkb-title {
-  font-size: 18px;
+  font-size: 17px;
   opacity: 1;
   -webkit-transition: opacity 0.3s linear;
   -moz-transition: opacity 0.3s linear;
@@ -19,6 +19,7 @@
 }
 
 .mkb-code-badge {
-  background-color: #1d8acb;
+  font-size: 17px;
+  background-color: #1186ca;
   color: #ffffff;
 }
