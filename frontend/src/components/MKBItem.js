@@ -1,10 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import EmbeddedLink from "./EmbeddedLink";
 import "./mkb_item.css";
 
 export default function MKBItem(props) {
-  const [isEditMode, setEditMode] = useState(false);
-
   const parseLinksInText = (text) => {
     if (text.length < 4) return text;
 
@@ -54,35 +52,38 @@ export default function MKBItem(props) {
 
   return (
     <>
-      <div className="ms-4 mt-1 me-auto">
+      {/* -- title and edit button -- */}
+      <div className="d-flex align-items-start justify-content-between ms-4 me-1 mt-1">
         <span id={"item-title-" + props.item.mkb_code} className="mkb-title">
           <span
-            className="mkb-code-badge px-2 rounded cursor-pointer"
+            className="mkb-code-badge px-1 rounded cursor-pointer"
             onClick={titleClickedHandler}
           >
             {props.item.mkb_code}
           </span>
-          <a href="/#" onClick={titleClickedHandler} className="ms-2">
+          <a href="/#" onClick={titleClickedHandler} className="ms-1">
             {props.item.title}
           </a>
         </span>
 
-        <br />
+        {props.isEditMode ? (
+          <span
+            className="btn-edit-item cursor-pointer rounded"
+            onClick={handleEditItem}
+          >
+            Изменить
+          </span>
+        ) : null}
+      </div>
+
+      {/* -- subtitle -- */}
+      <div className="d-flex justify-content-start ms-4 me-1 mt-1">
         <pre className="mkb-subtitle">
           {props.item.subtitle
             ? parseLinksInText(props.item.subtitle)
             : "Примечания отсутствуют."}
         </pre>
       </div>
-
-      {isEditMode ? (
-        <span
-          className="badge badge-edit text-dark cursor-pointer mx-2 mt-2"
-          onClick={handleEditItem}
-        >
-          Изменить
-        </span>
-      ) : null}
     </>
   );
 }

@@ -5,17 +5,22 @@ import MKBItem from "./MKBItem";
 import EditorModal from "./EditorModal";
 import axios from "axios";
 import Swal from "sweetalert2";
+import utils from "../utils";
 
 function MKBList() {
+  // #region ----------------- Variables and States ------------------------
+
   const rootParent = { id: 0, mkb_code: "МКБ-10", title: "Классы" };
 
-  const [isEditMode, setEditMode] = useState(false);
+  const [isEditMode, setEditMode] = useState(true);
 
-  const [nodes, setTreeNodes] = useState([rootParent]);
+  const [data, setData] = useState({
+    currentParent: rootParent,
+    treeNodes: [rootParent],
+    items: [],
+  });
 
-  const [items, setItems] = useState([]);
-
-  const [currentParent, setCurrentParent] = useState(-1);
+  const [navTreeHeight, setNavTreeHeight] = useState(56);
 
   const [editItem, setEditItem] = useState({
     mkb_code: "",
@@ -27,33 +32,9 @@ function MKBList() {
     parent: 0,
   });
 
-  function jumpto(anchor) {
-    window.location.href = "#" + anchor;
-  }
+  const [jumpPosition, setJumpPosition] = useState("top-pos");
 
-  const scrollToLastPosition = () => {
-    const scrollPosition = sessionStorage.getItem("scrollPosition");
-    if (scrollPosition) {
-      window.scrollTo(0, parseInt(scrollPosition));
-      sessionStorage.removeItem("scrollPosition");
-    }
-
-    console.log("Scrolled back to last postition...");
-  };
-
-  function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
-  //Make some animation effect on the target item
-  async function animateTargetItem(targetItem) {
-    for (let i = 0; i < 3; i++) {
-      targetItem.classList.toggle("mkb-title-fade");
-      await sleep(500);
-      targetItem.classList.toggle("mkb-title-fade");
-      await sleep(500);
-    }
-  }
+  // #endregion
 
   async function refreshItems(parent) {
     // if (parent === currentParent) return;   // TEST THIS LATER !!!
@@ -63,19 +44,19 @@ function MKBList() {
         params: { parent: parent.id },
       })
       .then((res) => {
-        setTreeNodes(res.data.parents);
-
-        setItems(res.data.mkb_records);
-
-        setCurrentParent(parent);
+        setData({
+          currentParent: parent,
+          treeNodes: res.data.parents,
+          items: res.data.mkb_records,
+        });
       });
   }
 
   useEffect(() => {
     const loadInitialData = async () => {
-      await refreshItems(rootParent);
+      setJumpPosition("top-pos");
 
-      jumpto("top-pos");
+      await refreshItems(rootParent);
     };
 
     loadInitialData();
@@ -83,24 +64,35 @@ function MKBList() {
     // eslint-disable-next-line
   }, []);
 
+  useEffect(() => {
+    // calculate current top offset
+    const topOffset = document.getElementById("nav-tree").clientHeight + 56;
+
+    if (navTreeHeight === topOffset) {
+      utils.jumpto(jumpPosition);
+    } else setNavTreeHeight(topOffset);
+  }, [data]);
+
+  useEffect(() => {
+    utils.jumpto(jumpPosition);
+  }, [navTreeHeight]);
+
   async function titleClickedHandler(selectedItem) {
-    if (selectedItem.id === nodes.at(-1).id) {
+    if (selectedItem.id === data.treeNodes.at(-1).id) {
       return;
     }
 
-    await refreshItems(selectedItem).then(() => {
-      jumpto("top-pos");
-      const element = document.getElementById("top-pos");
-      element.scrollIntoView({ behavior: "smooth" });
-    });
+    setJumpPosition("top-pos");
+
+    await refreshItems(selectedItem);
   }
 
   async function treeNodeClickedHandler(e, node) {
     e.preventDefault();
 
-    await refreshItems(node).then(() => {
-      jumpto("top-pos");
-    });
+    setJumpPosition("top-pos");
+
+    await refreshItems(node);
   }
 
   async function embeddedLinkClickedHandler(e, link) {
@@ -134,19 +126,17 @@ function MKBList() {
       return;
     }
 
+    setJumpPosition("anchor-at-" + processed_code);
+
     // Refresh list with new items
     await refreshItems(parent).then(() => {
-      jumpto("anchor-at-" + processed_code);
+      // Make some animation effect on the target item
+      let targetItem = document.getElementById("item-title-" + processed_code);
+      utils.animateTargetItem(targetItem);
     });
-
-    // Make some animation effect on the target item
-    let targetItem = document.getElementById("item-title-" + processed_code);
-    animateTargetItem(targetItem);
   }
 
   function handleSearchItemClicked(e, mkb_code) {
-    console.log("Search item clicked! mkb_code : " + mkb_code);
-
     embeddedLinkClickedHandler(e, mkb_code);
   }
 
@@ -166,7 +156,7 @@ function MKBList() {
       contents: "",
       actual: true,
       act_date: null, // use new Date() then .toISOString().slice(0, 10);
-      parent: currentParent,
+      parent: data.currentParent,
     };
 
     setEditItem(newItem);
@@ -176,6 +166,8 @@ function MKBList() {
 
   const handleEditItem = (selectedItem) => {
     setEditItem(selectedItem);
+
+    console.log("Edit item clicked!");
 
     toggleEditor();
   };
@@ -194,16 +186,16 @@ function MKBList() {
           editItem
         )
         .then((res) => {
-          refreshItems(currentParent); //editItem.parent);
+          refreshItems(data.currentParent);
         })
         .then(() => {
-          scrollToLastPosition();
+          utils.scrollToLastPosition();
         })
         .catch((error) => {
           Swal.fire({
             icon: "error",
             title: "Что-то пошло не так...",
-            html: `При отправке данных на сервер возникла ошибка: ${error.message}`,
+            html: `<pre>При отправке данных на сервер произошла ошибка:<p>${error.message}. ${error.response.data.detail}</p></pre>`,
           });
         });
     } else {
@@ -211,16 +203,18 @@ function MKBList() {
       axios
         .post(process.env.REACT_APP_API_URL + "records/", editItem)
         .then((res) => {
-          refreshItems(currentParent); //editItem.parent);
+          refreshItems(data.currentParent); //editItem.parent);
         })
         .then(() => {
-          scrollToLastPosition();
+          utils.scrollToLastPosition();
         })
         .catch((error) => {
           if (error.response) {
+            console.log(JSON.stringify(error.response));
+
             let errorMessage = error.response.data.mkb_code
               ? "Запись с таким кодом уже существует!"
-              : `Ошибка: ${JSON.stringify(error.response.data)}`;
+              : `Ошибка: ${error.response.data.detail}`;
 
             Swal.fire({
               icon: "error",
@@ -234,59 +228,48 @@ function MKBList() {
 
   //#endregion
 
-  /*
-  const navTreeStyles = {
-    top: "56px",
-    padding: "12px 5px",
-    maxWidth: "1080px",
-    marginLeft: "auto",
-    marginRight: "auto",
-    overflow: "hidden",
-    backgroundColor: "rgba(255, 255, 255, 1)",
-    zIndex: 99,
-  };
-  */
-
   return (
     <>
       <NavBar searchItemClickedHandler={handleSearchItemClicked} />
 
       <NavTree
-        parent={currentParent}
-        nodes={nodes}
+        id="nav-tree"
+        parent={data.currentParent}
+        nodes={data.treeNodes}
+        isEditMode={isEditMode}
         onTreeNodeClicked={treeNodeClickedHandler}
+        onAddItemClicked={handleAddItem}
       />
 
-      <a id="top-pos" className="anchor" href="/#" />
-
-      {isEditMode ? (
-        <span
-          className="badge text-dark cursor-pointer d-inline-block py-2 me-1"
-          onClick={handleAddItem}
-          style={{ backgroundColor: "#7CFC00" }}
-        >
-          Добавить
-        </span>
-      ) : null}
+      <a
+        id="top-pos"
+        className="anchor"
+        href="/#"
+        style={{ scrollMarginTop: navTreeHeight }}
+      />
 
       <ol className="list-group list-group-numbered">
         {/* eslint-disable-next-line */}
 
-        {items.map((item) => (
-          <li
-            key={item.id}
-            className="list-group-item d-flex justify-content-between align-items-start rounded m-0 p-1"
-          >
-            {/* eslint-disable-next-line */}
-            <a id={"anchor-at-" + item.mkb_code} className="anchor" href="/#" />
-            <MKBItem
-              item={item}
-              onTitleClicked={titleClickedHandler}
-              onEmbeddedLinkClicked={embeddedLinkClickedHandler}
-              editItemHandler={handleEditItem}
-            />
-          </li>
-        ))}
+        {data.items &&
+          data.items.map((item) => (
+            <li key={item.id} className="list-group-item rounded m-0 p-1">
+              {/* eslint-disable-next-line */}
+              <a
+                id={"anchor-at-" + item.mkb_code}
+                className="anchor"
+                href="/#"
+                style={{ scrollMarginTop: navTreeHeight }}
+              />
+              <MKBItem
+                item={item}
+                isEditMode={isEditMode}
+                onTitleClicked={titleClickedHandler}
+                onEmbeddedLinkClicked={embeddedLinkClickedHandler}
+                editItemHandler={handleEditItem}
+              />
+            </li>
+          ))}
       </ol>
 
       {modal ? (

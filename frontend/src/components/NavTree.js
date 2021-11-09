@@ -1,4 +1,5 @@
 import React from "react";
+import "./navtree.css";
 
 export default function NavTree(props) {
   const generatedNodes = (nodes) => {
@@ -16,31 +17,40 @@ export default function NavTree(props) {
       .concat(<span key={nodes.at(-1).id}>{nodes.at(-1).mkb_code}</span>);
   };
 
-  const navTreeStyles = {
-    top: "56px",
-    padding: "12px 5px 0px 0px",
-    maxWidth: "1080px",
-    marginLeft: "auto",
-    marginRight: "auto",
-    backgroundColor: "rgba(255, 255, 255, 1)",
-  };
-
   return (
-    <div className="container sticky-top" style={navTreeStyles}>
-      <div className="d-flex ms-3" style={{ fontSize: "17px" }}>
-        {props.nodes.length > 1
-          ? generatedNodes(props.nodes).reduce((prev, curr) => [
+    <div
+      id="nav-tree"
+      className="container nav-tree-container sticky-top rounded"
+    >
+      {props.nodes.length > 1 ? (
+        <>
+          <div className="d-inline-block nav-tree-nodes mb-1">
+            {generatedNodes(props.nodes).reduce((prev, curr) => [
               prev,
               <span key={"delimiter_" + prev.key} className="mx-1">
                 |
               </span>,
               curr,
-            ])
-          : null}
-      </div>
+            ])}
+          </div>{" "}
+          <br />
+        </>
+      ) : null}
 
-      <div className="row ms-3 pt-2">
-        <h5>{props.parent.mkb_code + " - " + props.parent.title}</h5>
+      <div className="container-liquid d-flex align-items-start justify-content-between">
+        <span className="nav-tree-nodes me-1">
+          <span>{props.parent.mkb_code + ": "}</span>
+          <span>{props.parent.title}</span>
+        </span>
+
+        {props.isEditMode ? (
+          <span
+            className="btn-add-item cursor-pointer rounded"
+            onClick={props.onAddItemClicked}
+          >
+            Добавить
+          </span>
+        ) : null}
       </div>
     </div>
   );

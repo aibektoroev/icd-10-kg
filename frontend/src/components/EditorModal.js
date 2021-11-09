@@ -1,16 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Button,
-  Modal,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Form,
-  FormGroup,
-  Input,
-  Label,
-  FormFeedback,
-} from "reactstrap";
+import { Button, Modal, Form, FormGroup, InputGroup } from "react-bootstrap";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import "./editorstyles.css";
@@ -108,59 +97,63 @@ function EditorModal(props) {
 
   return (
     <Modal
-      isOpen={true}
-      toggle={props.toggle}
+      show={props.toggle}
+      backdrop={"static"}
+      keyboard={true}
+      onEscapeKeyDown={props.toggle}
       centered={true}
-      autoFocus={false}
       size="lg"
     >
-      <ModalHeader>
-        {editItem.id ? "Редактирование записи" : "Новая запись"}
-      </ModalHeader>
-      <ModalBody>
-        <Form>
-          <FormGroup className="form-group">
-            <Label for="mkb_code" className="text-secondary">
-              Код МКБ
-            </Label>
-            <Input
-              id="editor-mkb-code"
-              className="mkb-code"
-              type="text"
-              name="mkb_code"
-              value={editItem.mkb_code}
-              onChange={handleChange}
-              autoFocus={true}
-              invalid={!mkbCodeValid}
-            />
-            <FormFeedback>
-              Код должен иметь формат вида A00-Z99 | A09 | A09* | A09+ | A09.1 |
-              A09.1* | A09.1+
-            </FormFeedback>
-          </FormGroup>
+      <Modal.Header>
+        <Modal.Title>
+          {editItem.id ? "Редактирование записи" : "Новая запись"}
+        </Modal.Title>
+      </Modal.Header>
 
-          <FormGroup className="form-group">
-            <Label for="title" className="text-secondary">
-              Наименование
-            </Label>
-            <Input
+      <Modal.Body>
+        <Form noValidate>
+          <Form.Group className="form-group">
+            <Form.Label className="text-secondary">Код МКБ</Form.Label>
+            <InputGroup hasValidation>
+              <Form.Control
+                id="editor-mkb-code"
+                className="mkb-code"
+                type="text"
+                name="mkb_code"
+                value={editItem.mkb_code}
+                onChange={handleChange}
+                autoFocus={true}
+                isInvalid={!mkbCodeValid}
+              />
+              <Form.Control.Feedback type="invalid">
+                Код должен иметь формат вида A00-Z99 | A09 | A09* | A09+ | A09.1
+                | A09.1* | A09.1+
+              </Form.Control.Feedback>
+            </InputGroup>
+          </Form.Group>
+
+          <Form.Group className="form-group" hasValidation>
+            <Form.Label className="text-secondary">Наименование</Form.Label>
+            <Form.Control
               id="editor-title"
               className="title"
               type="text"
               name="title"
               value={editItem.title}
               onChange={handleChange}
-              invalid={!titleValid}
+              isInvalid={!titleValid}
             />
-            <FormFeedback>Поле не может быть пустым</FormFeedback>
-          </FormGroup>
+            <Form.Control.Feedback type="invalid">
+              Поле не может быть пустым
+            </Form.Control.Feedback>
+          </Form.Group>
 
           <FormGroup className="form-group">
-            <Label for="subtitle" className="text-secondary">
+            <Form.Label className="text-secondary">
               Примечания (Включения/Исключения)
-            </Label>
-            <Input
-              type="textarea"
+            </Form.Label>
+            <Form.Control
+              as="textarea"
               name="subtitle"
               style={{ minHeight: 220 }}
               value={editItem.subtitle}
@@ -169,18 +162,16 @@ function EditorModal(props) {
           </FormGroup>
 
           <FormGroup className="form-group">
-            <Label for="contents" className="text-secondary">
-              Содержимое
-            </Label>
-            <Input
-              type="textarea"
+            <Form.Label className="text-secondary">Содержимое</Form.Label>
+            <Form.Control
+              as="textarea"
               name="contents"
               value={editItem.contents}
               onChange={handleChange}
             />
           </FormGroup>
 
-          <FormGroup className="form-group">
+          <Form.Group className="form-group">
             <FormControlLabel
               control={
                 <Switch
@@ -192,18 +183,17 @@ function EditorModal(props) {
               }
               label="Запись актуальна?"
             />
-          </FormGroup>
+          </Form.Group>
         </Form>
-      </ModalBody>
-
-      <ModalFooter>
-        <Button color="primary" onClick={onSubmit}>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="primary" type="submit" onClick={onSubmit}>
           Сохранить
         </Button>{" "}
-        <Button color="secondary" onClick={props.toggle}>
+        <Button variant="secondary" onClick={props.toggle}>
           Отмена
         </Button>
-      </ModalFooter>
+      </Modal.Footer>
     </Modal>
   );
 }

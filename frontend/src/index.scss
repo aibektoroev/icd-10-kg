@@ -6,7 +6,7 @@ html {
 
 #wrapper {
   margin: 0 auto;
-  padding-top: 56px;
+  padding-top: 48px;
   padding-bottom: 1rem;
   max-width: 1080px;
 }
@@ -15,8 +15,8 @@ a.anchor {
   visibility: hidden;
 }
 
-:target {
-  scroll-margin-top: 140px;
+.anchor:target {
+  scroll-margin-top: 86px;
 }
 
 pre {
@@ -47,8 +47,4 @@ ol > li::before {
 
 .cursor-pointer {
   cursor: pointer;
-}
-
-.badge-edit {
-  background-color: #ffea00;
 }

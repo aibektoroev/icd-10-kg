@@ -3,11 +3,11 @@ import MKBList from "./components/MKBList";
 
 function App() {
   return (
-    <>
+    <React.Fragment>
       <div id="wrapper">
         <MKBList />
       </div>
-    </>
+    </React.Fragment>
   );
 }
 
