@@ -12,7 +12,7 @@ function MKBList() {
 
   const rootParent = { id: 0, mkb_code: "МКБ-10", title: "Классы" };
 
-  const [isEditMode, setEditMode] = useState(true);
+  const [isEditMode, setEditMode] = useState(false);
 
   const [data, setData] = useState({
     currentParent: rootParent,
@@ -131,7 +131,7 @@ function MKBList() {
     // Refresh list with new items
     await refreshItems(parent).then(() => {
       // Make some animation effect on the target item
-      let targetItem = document.getElementById("item-title-" + processed_code);
+      let targetItem = document.getElementById("item-" + processed_code);
       utils.animateTargetItem(targetItem);
     });
   }

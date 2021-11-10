@@ -9,6 +9,7 @@ const utils = {
   },
 
   //Make some animation effect on the target item
+
   animateTargetItem: async function (targetItem) {
     for (let i = 0; i < 3; i++) {
       targetItem.classList.toggle("mkb-title-fade");

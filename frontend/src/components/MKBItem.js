@@ -51,10 +51,10 @@ export default function MKBItem(props) {
   };
 
   return (
-    <>
+    <div className="mkb-item-container">
       {/* -- title and edit button -- */}
       <div className="d-flex align-items-start justify-content-between ms-4 me-1 mt-1">
-        <span id={"item-title-" + props.item.mkb_code} className="mkb-title">
+        <span id={"item-" + props.item.mkb_code} className="mkb-title">
           <span
             className="mkb-code-badge px-1 rounded cursor-pointer"
             onClick={titleClickedHandler}
@@ -84,6 +84,6 @@ export default function MKBItem(props) {
             : "Примечания отсутствуют."}
         </pre>
       </div>
-    </>
+    </div>
   );
 }
