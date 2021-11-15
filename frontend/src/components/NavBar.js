@@ -1,14 +1,26 @@
-import React from "react";
+import React, { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import SearchBar from "./SearchBar";
+import AppContext from "../context";
 import "./navbar.css";
 
 export default function NavBar(props) {
+  const { isLoggedIn, setIsLoggedIn } = useContext(AppContext);
+
+  const navigate = useNavigate();
+
   const onLoginClicked = (event) => {
     event.preventDefault();
 
-    // TO DO : implement login fuctionality
+    if (isLoggedIn) {
+      // Exit
+      setIsLoggedIn(false);
 
-    console.log("LOGIN Clicked!!!");
+      navigate("/logout");
+    } else {
+      // Go to login page
+      navigate("/login");
+    }
   };
 
   return (
@@ -23,7 +35,7 @@ export default function NavBar(props) {
           />
           <small>
             <a href="/#" onClick={onLoginClicked} className="text-light mx-2">
-              Войти
+              {isLoggedIn ? "Выйти" : "Войти"}
             </a>
           </small>
         </span>

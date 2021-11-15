@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import EmbeddedLink from "./EmbeddedLink";
 import "./mkb_item.css";
+import AppContext from "../context";
 
 export default function MKBItem(props) {
+  const { isLoggedIn } = useContext(AppContext);
+
   const parseLinksInText = (text) => {
     if (text.length < 4) return text;
 
@@ -66,7 +69,7 @@ export default function MKBItem(props) {
           </a>
         </span>
 
-        {props.isEditMode ? (
+        {isLoggedIn ? (
           <span
             className="btn-edit-item cursor-pointer rounded"
             onClick={handleEditItem}

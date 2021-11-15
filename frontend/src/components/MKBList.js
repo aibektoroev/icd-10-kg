@@ -1,18 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import NavBar from "./NavBar";
 import NavTree from "./NavTree";
 import MKBItem from "./MKBItem";
 import EditorModal from "./EditorModal";
 import axios from "axios";
+import axiosInstance from "../axios";
 import Swal from "sweetalert2";
 import utils from "../utils";
+import { useNavigate } from "react-router-dom";
+import AppContext from "../context";
 
 function MKBList() {
   // #region ----------------- Variables and States ------------------------
 
-  const rootParent = { id: 0, mkb_code: "МКБ-10", title: "Классы" };
+  const { setIsLoggedIn } = useContext(AppContext);
 
-  const [isEditMode, setEditMode] = useState(false);
+  const navigate = useNavigate();
+
+  const rootParent = { id: 0, mkb_code: "МКБ-10", title: "Классы" };
 
   const [data, setData] = useState({
     currentParent: rootParent,
@@ -49,10 +54,27 @@ function MKBList() {
           treeNodes: res.data.parents,
           items: res.data.mkb_records,
         });
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: "error",
+          title: "Что-то пошло не так...",
+          html: `<p>${error.message}</p>`,
+        });
       });
   }
 
   useEffect(() => {
+    // On component did mount do:
+    // 1. Check tokens expiration: if expired then set isLoggedIn state to false, else to true
+    // 2. Load initial data
+
+    // Check tokens expiration
+    const token = utils.getToken();
+
+    setIsLoggedIn(token.valid);
+
+    // Load initial data
     const loadInitialData = async () => {
       setJumpPosition("top-pos");
 
@@ -106,25 +128,30 @@ function MKBList() {
         params: { mkb_code: link },
       })
       .then((res) => {
-        if (res.status !== 200) {
+        if (res.status === 204) {
+          Swal.fire({
+            icon: "error",
+            title: "Нерабочая ссылка...",
+            html:
+              "<pre>Не удалось обнаружить запись по указанной ссылке!<br/>Вы поможете улучшить приложение, если сообщите нам об этой ошибке...<br/></pre>" +
+              String.fromCodePoint(0x1f917),
+          });
+
           return;
         }
 
         processed_code = res.data.processed_code;
         parent = res.data.parent;
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: "error",
+          title: "Что-то пошло не так...",
+          html: `<p>${error.message}</p>`,
+        });
       });
 
-    if (processed_code === "") {
-      Swal.fire({
-        icon: "error",
-        title: "Нерабочая ссылка...",
-        html:
-          "<pre>Не удалось обнаружить запись по указанной ссылке!<br/>Вы поможете улучшить приложение, если сообщите нам об этой ошибке...<br/></pre>" +
-          String.fromCodePoint(0x1f917),
-      });
-
-      return;
-    }
+    if (!processed_code || !parent) return;
 
     setJumpPosition("anchor-at-" + processed_code);
 
@@ -156,7 +183,7 @@ function MKBList() {
       contents: "",
       actual: true,
       act_date: null, // use new Date() then .toISOString().slice(0, 10);
-      parent: data.currentParent,
+      parent: data.currentParent.id,
     };
 
     setEditItem(newItem);
@@ -167,8 +194,6 @@ function MKBList() {
   const handleEditItem = (selectedItem) => {
     setEditItem(selectedItem);
 
-    console.log("Edit item clicked!");
-
     toggleEditor();
   };
 
@@ -178,52 +203,61 @@ function MKBList() {
     // Set current scroll position
     sessionStorage.setItem("scrollPosition", window.pageYOffset);
 
-    if (editItem.id) {
-      // if existing item then update (PUT)
-      axios
-        .put(
-          process.env.REACT_APP_API_URL + `records/${editItem.id}/`,
-          editItem
-        )
-        .then((res) => {
-          refreshItems(data.currentParent);
-        })
-        .then(() => {
-          utils.scrollToLastPosition();
-        })
-        .catch((error) => {
+    const request = async () => {
+      return editItem.id
+        ? axiosInstance.put(`records/${editItem.id}/`, editItem) // PUT:  edit item
+        : axiosInstance.post(`records/`, editItem); // POST: create new item
+    };
+
+    request()
+      .then((res) => {
+        refreshItems(data.currentParent);
+      })
+      .then(() => {
+        utils.scrollToLastPosition();
+      })
+      .catch((error) => {
+        let errorMessage = "";
+
+        if (error.response) {
+          // Request made and server responded
+
+          if ([401, 403].includes(error.response.status)) {
+            setIsLoggedIn(false);
+
+            Swal.fire({
+              icon: "warning",
+              title: `Статус ${error.response.status}`,
+              html: "Активная сессия истекла. Для выполнения данной операции необходимо авторизоваться в системе...",
+
+              confirmButtonColor: "#3085d6",
+              confirmButtonText: "Пройти авторизацию",
+
+              showCancelButton: true,
+              cancelButtonColor: "#d33",
+              cancelButtonText: "Отмена",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                navigate("/login");
+              }
+            });
+          } else {
+            errorMessage = error.response.data.mkb_code
+              ? "Запись с таким кодом уже существует"
+              : error.message;
+          }
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          errorMessage = error.message;
+        }
+
+        if (errorMessage)
           Swal.fire({
             icon: "error",
             title: "Что-то пошло не так...",
-            html: `<pre>При отправке данных на сервер произошла ошибка:<p>${error.message}. ${error.response.data.detail}</p></pre>`,
+            html: `<p>При отправке данных на сервер произошла ошибка:</p><p>${errorMessage}.</p>`,
           });
-        });
-    } else {
-      // if new item then create (POST)
-      axios
-        .post(process.env.REACT_APP_API_URL + "records/", editItem)
-        .then((res) => {
-          refreshItems(data.currentParent); //editItem.parent);
-        })
-        .then(() => {
-          utils.scrollToLastPosition();
-        })
-        .catch((error) => {
-          if (error.response) {
-            console.log(JSON.stringify(error.response));
-
-            let errorMessage = error.response.data.mkb_code
-              ? "Запись с таким кодом уже существует!"
-              : `Ошибка: ${error.response.data.detail}`;
-
-            Swal.fire({
-              icon: "error",
-              title: `Статус ${error.response.status}`,
-              html: errorMessage,
-            });
-          }
-        });
-    }
+      });
   };
 
   //#endregion
@@ -236,7 +270,6 @@ function MKBList() {
         id="nav-tree"
         parent={data.currentParent}
         nodes={data.treeNodes}
-        isEditMode={isEditMode}
         onTreeNodeClicked={treeNodeClickedHandler}
         onAddItemClicked={handleAddItem}
       />
@@ -263,7 +296,6 @@ function MKBList() {
               />
               <MKBItem
                 item={item}
-                isEditMode={isEditMode}
                 onTitleClicked={titleClickedHandler}
                 onEmbeddedLinkClicked={embeddedLinkClickedHandler}
                 editItemHandler={handleEditItem}

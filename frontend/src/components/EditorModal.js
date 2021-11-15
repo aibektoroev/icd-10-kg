@@ -103,6 +103,7 @@ function EditorModal(props) {
       onEscapeKeyDown={props.toggle}
       centered={true}
       size="lg"
+      animation={false}
     >
       <Modal.Header>
         <Modal.Title>
@@ -114,7 +115,7 @@ function EditorModal(props) {
         <Form noValidate>
           <Form.Group className="form-group">
             <Form.Label className="text-secondary">Код МКБ</Form.Label>
-            <InputGroup hasValidation>
+            <InputGroup>
               <Form.Control
                 id="editor-mkb-code"
                 className="mkb-code"
@@ -122,7 +123,7 @@ function EditorModal(props) {
                 name="mkb_code"
                 value={editItem.mkb_code}
                 onChange={handleChange}
-                autoFocus={true}
+                autoFocus
                 isInvalid={!mkbCodeValid}
               />
               <Form.Control.Feedback type="invalid">
@@ -132,7 +133,7 @@ function EditorModal(props) {
             </InputGroup>
           </Form.Group>
 
-          <Form.Group className="form-group" hasValidation>
+          <Form.Group className="form-group">
             <Form.Label className="text-secondary">Наименование</Form.Label>
             <Form.Control
               id="editor-title"

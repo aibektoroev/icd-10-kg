@@ -1,11 +1,12 @@
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework import viewsets
+from rest_framework import viewsets, views
 from rest_framework import generics
 from rest_framework import filters
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from .models import MKBRecord
 from .serializers import MKBRecordSerializer, MKBSearchSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class FilterByParent(viewsets.ModelViewSet):
@@ -17,16 +18,20 @@ class FilterByParent(viewsets.ModelViewSet):
 
         parent = int(request.query_params.get('parent'))
 
-        mkb_records = MKBRecord.records.filter(parent=parent).order_by("mkb_code").values()
+        try:
+            mkb_records = MKBRecord.records.filter(parent=parent).order_by("mkb_code").values()
 
-        while parent:
-            parent_record = MKBRecord.records.get(id=parent)
-            parents.insert(1, {"id": parent_record.id, "mkb_code": parent_record.mkb_code, "title": parent_record.title})
-            parent = parent_record.parent            
-       
-        return Response(data={"parents": parents,
-                            "mkb_records": mkb_records},
-                            status=status.HTTP_200_OK)
+            while parent:
+                parent_record = MKBRecord.records.get(id=parent)
+                parents.insert(1, {"id": parent_record.id, "mkb_code": parent_record.mkb_code, "title": parent_record.title})
+                parent = parent_record.parent            
+        
+            return Response(data={"parents": parents,
+                                "mkb_records": mkb_records},
+                                status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(status=status.HTTP_404_NOT_FOUND, data={"message": "Ошибка 404: Запись не существует"})
+
 
 
 class ParentByCode(viewsets.ModelViewSet):
@@ -77,3 +82,14 @@ class RecordsViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = MKBRecordSerializer
     queryset = MKBRecord.records.all()
+
+
+class BlacklistTokenUpdateView(views.APIView):
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh_token"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response(status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST)

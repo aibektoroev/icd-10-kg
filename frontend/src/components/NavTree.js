@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
 import "./navtree.css";
+import AppContext from "../context";
 
 export default function NavTree(props) {
+  const { isLoggedIn } = useContext(AppContext);
+
   const generatedNodes = (nodes) => {
     return nodes
       .slice(0, -1)
@@ -43,7 +46,7 @@ export default function NavTree(props) {
           <span>{props.parent.title}</span>
         </span>
 
-        {props.isEditMode ? (
+        {isLoggedIn ? (
           <span
             className="btn-add-item cursor-pointer rounded"
             onClick={props.onAddItemClicked}

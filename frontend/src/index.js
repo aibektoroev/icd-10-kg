@@ -1,23 +1,47 @@
-import React from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import { Route, Routes, BrowserRouter as Router } from "react-router-dom";
 import "./index.scss";
 import App from "./App";
-import reportWebVitals from "./reportWebVitals";
 import Login from "./components/Login";
+import Logout from "./components/Logout";
+import AppContext from "./context";
+import reportWebVitals from "./reportWebVitals";
 
-const routing = (
-  <Router>
-    <React.StrictMode>
-      <Routes>
-        <Route exact path="/" element={<App />} />
-        <Route path="/login" element={<Login />} />
-      </Routes>
-    </React.StrictMode>
-  </Router>
-);
+function Main() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-ReactDOM.render(routing, document.getElementById("root"));
+  return (
+    <React.Fragment>
+      <Router>
+        <React.StrictMode>
+          <Routes>
+            <Route
+              exact
+              path="/"
+              element={
+                <AppContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>
+                  <App />
+                </AppContext.Provider>
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                <AppContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>
+                  <Login />
+                </AppContext.Provider>
+              }
+            />
+            <Route path="/logout" element={<Logout />} />
+          </Routes>
+        </React.StrictMode>
+      </Router>
+    </React.Fragment>
+  );
+}
+
+ReactDOM.render(<Main />, document.getElementById("root"));
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
