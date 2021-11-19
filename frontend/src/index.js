@@ -3,8 +3,8 @@ import ReactDOM from "react-dom";
 import { Route, Routes, BrowserRouter as Router } from "react-router-dom";
 import "./index.scss";
 import App from "./App";
-import Login from "./components/Login";
-import Logout from "./components/Logout";
+import Login from "./components/login";
+import Logout from "./components/logout";
 import AppContext from "./context";
 import reportWebVitals from "./reportWebVitals";
 
