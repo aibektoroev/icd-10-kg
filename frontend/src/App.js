@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
-import NavBar from "./components/navbar";
+import NavBar from "./components/nav-bar";
 import NavTree from "./components/nav-tree";
 import MKBList from "./components/mkb-list";
-import MKBItemDetailed from "./components/mkb_item_detailed";
+import MKBItemDetailed from "./components/mkb-item-detailed";
 import EditorModal from "./components/editor-modal";
 import axios from "axios";
 import axiosInstance from "./axios";

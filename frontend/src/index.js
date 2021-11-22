@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
-import { Route, Routes, BrowserRouter as Router } from "react-router-dom";
 import "./index.scss";
+import { Route, Routes, BrowserRouter as Router } from "react-router-dom";
 import App from "./App";
 import Login from "./components/login";
 import Logout from "./components/logout";
+import Alphabet from "./components/alphabets";
 import AppContext from "./context";
-import reportWebVitals from "./reportWebVitals";
+//import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
 
 function Main() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -34,6 +35,7 @@ function Main() {
               }
             />
             <Route path="/logout" element={<Logout />} />
+            {/*<Route path="/alphabet" element={<Alphabet />} />*/}
           </Routes>
         </React.StrictMode>
       </Router>
@@ -42,8 +44,3 @@ function Main() {
 }
 
 ReactDOM.render(<Main />, document.getElementById("root"));
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();

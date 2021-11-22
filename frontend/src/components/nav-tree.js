@@ -42,7 +42,9 @@ export default function NavTree(props) {
 
       <div className="container-liquid d-flex align-items-start justify-content-between">
         <span className="nav-tree-nodes me-1">
-          <span>{props.parent.mkb_code + ": "}</span>
+          {props.parent.mkb_code !== "МКБ-10" ? (
+            <span>{props.parent.mkb_code + ": "}</span>
+          ) : null}
           <span>{props.parent.title}</span>
         </span>
 

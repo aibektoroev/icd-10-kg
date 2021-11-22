@@ -68,47 +68,47 @@ function SearchBar(props) {
 
     setInputText("");
 
-    document.getElementById("searchInput").focus();
+    document.getElementById("search-input").focus();
   }
 
   function showSearchResults() {
     setInputGotFocus(true);
 
-    document.getElementById("listSearchResults").style.display = "block";
+    document.getElementById("list-results").style.display = "block";
   }
 
   const hideSearchResults = () => {
     setInputGotFocus(false);
 
-    document.getElementById("listSearchResults").style.display = "none";
+    document.getElementById("list-results").style.display = "none";
   };
 
   return (
     <OutsideClickHandler onOutsideClick={hideSearchResults}>
-      <div className="searchBar">
-        <div className="searchField">
+      <div className="search-bar">
+        <div className="search-field">
           <input
-            id="searchInput"
+            id="search-input"
             type="text"
             value={inputText}
             placeholder="Код или наименование"
             onChange={handleInput}
             onFocus={showSearchResults}
           />
-          <div className="searchIcon">
+          <div className="search-icon">
             {inputText.length > 0 && inputGotFocus ? (
               <CloseIcon
-                className="closeIcon"
-                color="primary"
+                className="close-icon"
+                color="#2BA3D4"
                 onClick={clearInput}
               />
             ) : (
-              <SearchIcon color="primary" />
+              <SearchIcon color="#2BA3D4" />
             )}
           </div>
         </div>
 
-        <div id="listSearchResults" className="listResults">
+        <div id="list-results" className="list-results">
           {searchResults.map((record) => (
             <SearchItem
               key={record.id}

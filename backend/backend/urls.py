@@ -12,6 +12,9 @@ router = routers.DefaultRouter()
 router.register(r'filterbyparent', views.FilterByParent, 'filtered')
 router.register(r'getparentbycode', views.ParentByCode, 'parent')
 router.register(r'records', views.RecordsViewSet, 'record')
+router.register(r'alphabet_categories', views.AlphabetCategoryViewSet, 'alphabet_category')
+router.register(r'alphabet_groups', views.AlphabetGroupViewSet, 'alphabet_group')
+router.register(r'alphabets', views.AlphabetViewSet, 'alphabet')
 
 
 urlpatterns = [

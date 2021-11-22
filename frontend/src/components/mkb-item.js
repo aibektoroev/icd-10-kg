@@ -15,16 +15,26 @@ export default function MKBItem(props) {
 
     const links = Array.from(text.matchAll(pattern));
 
+    if (props.item.mkb_code === "A18.0+") console.log("FOUND LINKS : " + links);
+
     let [left, right] = ["", text];
     const elements = [];
 
     links.forEach((link, index) => {
       link = link[0];
 
-      const exp = new RegExp(link + "(.+)");
+      /* Did not work properly
+      const exp = new RegExp(`/${link}(.+)/`);
 
       [left, ...right] = right.split(exp);
-      right = right.join("");
+      */
+
+      const split_pos = right.indexOf(link);
+
+      left = right.substring(0, split_pos);
+      right = right.substring(split_pos + link.length);
+
+      //right = right.join("");
 
       elements.push(<span key={"" + index + 1}>{left}</span>);
       elements.push(

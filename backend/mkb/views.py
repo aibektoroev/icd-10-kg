@@ -4,8 +4,8 @@ from rest_framework import viewsets, views
 from rest_framework import generics
 from rest_framework import filters
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from .models import MKBRecord
-from .serializers import MKBRecordSerializer, MKBSearchSerializer
+from .models import AlphabetCategory, AlphabetGroup, Alphabet, MKBRecord
+from .serializers import AlphabetCategorySerializer, AlphabetGroupSerializer, AlphabetSerializer, MKBRecordSerializer, MKBSearchSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
@@ -82,6 +82,40 @@ class RecordsViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = MKBRecordSerializer
     queryset = MKBRecord.records.all()
+
+
+class AlphabetViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    serializer_class = AlphabetSerializer
+    
+    def list(self, request):
+
+        group = int(request.query_params.get('group'))
+
+        alphabets = Alphabet.alphabets.filter(group=group).order_by("phrase").values()
+
+        return Response(data={"alphabets": alphabets},
+                                status=status.HTTP_200_OK)
+
+
+class AlphabetGroupViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    serializer_class = AlphabetGroupSerializer
+    
+    def list(self, request):
+
+        category = int(request.query_params.get('category'))
+
+        groups = AlphabetGroup.groups.filter(category=category).order_by("name").values()
+
+        return Response(data={"groups": groups},
+                                status=status.HTTP_200_OK)
+
+
+class AlphabetCategoryViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    serializer_class = AlphabetCategorySerializer
+    queryset = AlphabetCategory.categories.all()
 
 
 class BlacklistTokenUpdateView(views.APIView):

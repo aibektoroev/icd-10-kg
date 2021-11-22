@@ -1,0 +1,33 @@
+.navbar {
+  background-color: #128cbd;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
+}
+
+.container-contents {
+  max-width: 1080px;
+}
+
+.navbar-toggler {
+  cursor: pointer;
+  border-color: #128cbd !important;
+}
+
+.navbar-brandname {
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.nav-item {
+  font-size: 16px;
+  margin-top: 2px;
+  margin-right: 0px;
+  color: white !important;
+}
+
+/* For Tablets and Mobile */
+@media screen and (max-width: 767px) {
+  .nav-item {
+    margin: 0px auto 0px 5px;
+  }
+}
