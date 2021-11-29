@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import OutsideClickHandler from "react-outside-click-handler";
 import { Navbar, Nav, Container, NavbarBrand } from "react-bootstrap";
@@ -11,12 +11,30 @@ import "./styles/nav-bar.css";
 export default function NavBar(props) {
   const [expanded, setExpanded] = useState(false);
 
+  const [mobileView, setMobileView] = useState(false);
+
   const { isLoggedIn, setIsLoggedIn } = useContext(AppContext);
 
   const navigate = useNavigate();
 
-  const onLoginClicked = (event) => {
-    event.preventDefault();
+  useEffect(() => {
+    setMobileView(window.innerWidth < 767);
+
+    const handleResize = () => {
+      setMobileView(window.innerWidth < 767);
+
+      //if (!mobileView && expanded) setExpanded(false);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  const onLoginClicked = (e) => {
+    e.preventDefault();
 
     if (isLoggedIn) {
       // Exit
@@ -29,31 +47,32 @@ export default function NavBar(props) {
     }
   };
 
+  const onAlphabetsClicked = (e) => {
+    e.preventDefault();
+
+    setExpanded(false);
+    navigate("/alphabet");
+  };
+
+  const unexpandIfMobileView = () => {
+    if (mobileView && expanded) setExpanded(false);
+  };
+
   const handleSearchItemClicked = (e, mkb_code) => {
     props.searchItemClickedHandler(e, mkb_code);
 
-    setExpanded(false);
+    unexpandIfMobileView();
   };
 
   return (
-    <OutsideClickHandler
-      onOutsideClick={() => {
-        setExpanded(false);
-      }}
-    >
-      <Navbar
-        expand="md"
-        fixed="top"
-        collapseOnSelect
-        expanded={expanded}
-        className="navbar"
-      >
+    <OutsideClickHandler onOutsideClick={unexpandIfMobileView}>
+      <Navbar expand="md" fixed="top" expanded={expanded} className="navbar">
         <Container className="container-contents">
           <Nav.Link href="/" className="navbar-brandname">
             МКБ-10 для Кыргызстана
           </Nav.Link>
           <Navbar.Toggle
-            as="icon"
+            as="span"
             aria-controls="nav-items"
             data-bs-target="#nav-items"
             icon="bars-icon"
@@ -66,12 +85,15 @@ export default function NavBar(props) {
               <Nav.Link
                 href="/#"
                 className="nav-item"
-                onClick={() => setExpanded(false)}
+                onClick={onAlphabetsClicked}
               >
                 Алфавитные указатели
               </Nav.Link>
               <div className="nav-item">
-                <SearchBar searchItemClickedHandler={handleSearchItemClicked} />
+                <SearchBar
+                  mobileView={mobileView}
+                  searchItemClickedHandler={handleSearchItemClicked}
+                />
               </div>
               <Nav.Link href="/#" onClick={onLoginClicked} className="nav-item">
                 {isLoggedIn ? "Выйти" : "Войти"}

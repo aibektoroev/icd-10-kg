@@ -22,7 +22,7 @@
   height: 30px;
   width: 30px;
   background-color: white;
-  color: #128cbd;
+  color: #2ba3d4 !important;
   display: grid;
   place-items: center;
   border-radius: 0px 3px 3px 0px;
@@ -42,7 +42,7 @@
   margin-top: 2px;
   margin-left: 2px;
   width: 240px;
-  height: 280px;
+  height: 40px;
   border-radius: 3px;
   background-color: white;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
@@ -60,6 +60,5 @@
   .list-results {
     margin-top: 0px;
     margin-left: 0px;
-    height: 180px;
   }
 }

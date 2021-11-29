@@ -69,14 +69,14 @@ export default function Login() {
     e.preventDefault();
 
     if (!formData.username) {
-      setErrorMessage("Введите имя пользователя");
+      setErrorMessage("Введите имя пользователя *");
       // set focus to username input field
 
       return;
     }
 
     if (!formData.password) {
-      setErrorMessage("Введите пароль");
+      setErrorMessage("Введите пароль *");
       // set focus to password input field
 
       return;
@@ -99,11 +99,6 @@ export default function Login() {
         setIsLoggedIn(true);
 
         navigate("/");
-
-        // TO DO :
-        // if authorized then enable EditMode in an .env
-        // then go to homepage
-        // else show animation and text message that login credentials are incorrect
       })
       .catch((error) => {
         if (error.response)

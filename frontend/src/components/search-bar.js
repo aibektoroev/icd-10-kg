@@ -5,6 +5,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import { search } from "../api";
 import "./styles/search-bar.css";
+import { height } from "@mui/system";
 
 function SearchBar(props) {
   const [inputGotFocus, setInputGotFocus] = useState(false);
@@ -13,10 +14,33 @@ function SearchBar(props) {
 
   const [searchResults, setSearchResults] = useState([]);
 
+  const setStyles = () => {
+    let heightVal = "40px";
+
+    if (searchResults.length > 0) {
+      heightVal = props.mobileView ? "180px" : "280px";
+    }
+    document.getElementById("list-results").style.height = heightVal;
+  };
+
   useEffect(() => {
     const timeOutId = setTimeout(() => handleSearch(inputText), 150);
     return () => clearTimeout(timeOutId);
   }, [inputText]);
+
+  useEffect(() => {
+    setStyles();
+  }, [searchResults, props.mobileView]);
+
+  useEffect(() => {
+    if (inputGotFocus) {
+      //setStyles();
+
+      document.getElementById("list-results").style.display = "block";
+    } else {
+      document.getElementById("list-results").style.display = "none";
+    }
+  }, [inputGotFocus]);
 
   // Search functionality
   async function handleSearch(keyword) {
@@ -30,7 +54,7 @@ function SearchBar(props) {
       .then((res) => {
         if (res.data) {
           setSearchResults(res.data);
-          showSearchResults();
+          //showSearchResults();
         } //else setSearchResults([]);
       })
       .catch(function (error) {
@@ -54,7 +78,7 @@ function SearchBar(props) {
   const handleSearchItemClick = (e, mkb_code) => {
     props.searchItemClickedHandler(e, mkb_code);
 
-    hideSearchResults();
+    setInputGotFocus(false);
   };
 
   function handleInput(e) {
@@ -71,20 +95,12 @@ function SearchBar(props) {
     document.getElementById("search-input").focus();
   }
 
-  function showSearchResults() {
-    setInputGotFocus(true);
-
-    document.getElementById("list-results").style.display = "block";
-  }
-
-  const hideSearchResults = () => {
-    setInputGotFocus(false);
-
-    document.getElementById("list-results").style.display = "none";
-  };
-
   return (
-    <OutsideClickHandler onOutsideClick={hideSearchResults}>
+    <OutsideClickHandler
+      onOutsideClick={() => {
+        setInputGotFocus(false);
+      }}
+    >
       <div className="search-bar">
         <div className="search-field">
           <input
@@ -93,7 +109,9 @@ function SearchBar(props) {
             value={inputText}
             placeholder="Код или наименование"
             onChange={handleInput}
-            onFocus={showSearchResults}
+            onFocus={() => {
+              setInputGotFocus(true);
+            }}
           />
           <div className="search-icon">
             {inputText.length > 0 && inputGotFocus ? (
@@ -114,6 +132,7 @@ function SearchBar(props) {
               key={record.id}
               searchItemClickedHandler={handleSearchItemClick}
               mkb_code={record.mkb_code}
+              sign={record.sign}
               title={record.title}
             />
           ))}

@@ -1,22 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 import axiosInstance from "../axios";
 import "./styles/alphabet.css";
 
-export default function Alphabets() {
-  const { group_id } = useParams();
+export default function AlphabetGroups() {
+  const { cat_id } = useParams();
 
-  const [items, setItems] = useState([]);
+  const navigate = useNavigate();
 
-  async function loadItems(group_id) {
+  const [groups, setGroups] = useState([]);
+
+  async function loadGroups(cat_id) {
     await axios
-      .get(process.env.REACT_APP_API_URL + "alphabets", {
-        params: { group: group_id },
+      .get(process.env.REACT_APP_API_URL + "alphabet_groups", {
+        params: { category: cat_id },
       })
       .then((res) => {
-        setItems(res.data.alphabets);
+        setGroups(res.data.groups);
       })
       .catch((error) => {
         Swal.fire({
@@ -28,7 +30,7 @@ export default function Alphabets() {
   }
 
   useEffect(() => {
-    loadItems(group_id);
+    loadGroups(cat_id);
   }, []);
 
   /*
@@ -58,23 +60,31 @@ export default function Alphabets() {
 
   */
 
-  const groupClickedHandler = (e) => {
+  const groupClickedHandler = (e, group) => {
     e.preventDefault();
+
+    navigate(`/alphabet/${cat_id}/${group.id}`);
   };
 
   return (
     <React.Fragment>
       <div className="wrapper">
         <div className="card">
-          <div className="card-header text-center">Аб-Ад</div>
+          <div className="card-header text-center">
+            Алфавитный указатель болезней и травм по их характеру МКБ-10
+          </div>
           <ul className="list-group list-group-flush">
-            {items.map((item) => {
+            {groups.map((group) => {
               return (
-                <li key={item.id} className="list-group-item">
-                  <a href="/#" onClick={groupClickedHandler}>
-                    {item.phrase}
+                <li key={group.id} className="list-group-item">
+                  <a
+                    href="/#"
+                    onClick={(e) => {
+                      groupClickedHandler(e, group);
+                    }}
+                  >
+                    {group.name}
                   </a>
-                  <pre className="text-description">{item.details}</pre>
                 </li>
               );
             })}

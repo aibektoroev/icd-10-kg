@@ -15,15 +15,14 @@ export default function MKBItem(props) {
 
     const links = Array.from(text.matchAll(pattern));
 
-    if (props.item.mkb_code === "A18.0+") console.log("FOUND LINKS : " + links);
-
     let [left, right] = ["", text];
     const elements = [];
 
     links.forEach((link, index) => {
       link = link[0];
 
-      /* Did not work properly
+      /* This approach did not work properly */
+      /*
       const exp = new RegExp(`/${link}(.+)/`);
 
       [left, ...right] = right.split(exp);
@@ -65,14 +64,14 @@ export default function MKBItem(props) {
 
   return (
     <div className="mkb-item-container">
-      {/* -- title and edit button -- */}
+      {/* -- mkb-code, title and edit button -- */}
       <div className="d-flex align-items-start justify-content-between ms-4 me-1 mt-1">
         <span id={"item-" + props.item.mkb_code} className="mkb-title">
           <span
             className="mkb-code-badge px-1 rounded cursor-pointer"
             onClick={titleClickedHandler}
           >
-            {props.item.mkb_code}
+            {props.item.mkb_code + (props.item.sign ? props.item.sign : "")}
           </span>
           <a href="/#" onClick={titleClickedHandler} className="ms-1">
             {props.item.title}
@@ -91,7 +90,7 @@ export default function MKBItem(props) {
 
       {/* -- subtitle -- */}
       <div className="d-flex justify-content-start ms-4 me-1 mt-1">
-        <pre className="mkb-subtitle">
+        <pre className="text-description">
           {props.item.subtitle
             ? parseLinksInText(props.item.subtitle)
             : "Примечания отсутствуют."}

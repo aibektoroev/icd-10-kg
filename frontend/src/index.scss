@@ -32,7 +32,7 @@ pre {
 }
 
 a {
-  color: #128cbd;
+  color: #2490bb;
 }
 
 ol {
@@ -55,4 +55,10 @@ ol > li::before {
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+.text-description {
+  font-size: 12px;
+  color: #555555;
+  margin: 1px;
 }

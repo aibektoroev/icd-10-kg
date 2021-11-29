@@ -7,7 +7,9 @@ export default function SearchItem(props) {
       className="searchItem"
       onClick={(e) => props.searchItemClickedHandler(e, props.mkb_code)}
     >
-      <span className="mkbCode">{props.mkb_code}</span>
+      <span className="mkbCode">
+        {props.mkb_code + (props.sign ? props.sign : "")}
+      </span>
       <span className="mkbTitle">{props.title}</span>
     </div>
   );

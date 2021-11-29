@@ -18,7 +18,7 @@ function App() {
 
   const navigate = useNavigate();
 
-  const rootParent = { id: 0, mkb_code: "МКБ-10", title: "Классы" };
+  const rootParent = { id: 0, mkb_code: "МКБ-10", sign: "", title: "Классы" };
 
   const [data, setData] = useState({
     currentParent: rootParent,
@@ -28,17 +28,21 @@ function App() {
 
   const [navTreeHeight, setNavTreeHeight] = useState(56);
 
-  const [editItem, setEditItem] = useState({
-    mkb_code: "",
-    title: "",
-    subtitle: "",
-    contents: "",
-    actual: true,
-    act_date: null,
-    parent: 0,
+  const [editData, setEditData] = useState({
+    item: {
+      mkb_code: "",
+      sign: "",
+      title: "",
+      subtitle: "",
+      contents: "",
+      actual: true,
+      act_date: null,
+      parent: 0,
+    },
+    isEditing: false,
   });
 
-  const [jumpPosition, setJumpPosition] = useState("top-pos");
+  const [jumpPosition, setJumpPosition] = useState("top");
 
   // #endregion
 
@@ -77,7 +81,7 @@ function App() {
 
     // Load initial data
     const loadInitialData = async () => {
-      setJumpPosition("top-pos");
+      setJumpPosition("top");
 
       await refreshItems(rootParent);
     };
@@ -105,7 +109,7 @@ function App() {
       return;
     }
 
-    setJumpPosition("top-pos");
+    setJumpPosition("top");
 
     await refreshItems(selectedItem);
   }
@@ -113,7 +117,7 @@ function App() {
   async function treeNodeClickedHandler(e, node) {
     e.preventDefault();
 
-    setJumpPosition("top-pos");
+    setJumpPosition("top");
 
     await refreshItems(node);
   }
@@ -176,9 +180,20 @@ function App() {
     setModal(!modal);
   };
 
+  useEffect(() => {
+    if (
+      editData.item.sign &&
+      editData.item.mkb_code.slice(-1) !== editData.item.sign
+    )
+      editData.item.mkb_code += editData.item.sign;
+
+    if (editData.isEditing) toggleEditor();
+  }, [editData]);
+
   const handleAddItem = () => {
     const newItem = {
       mkb_code: "",
+      sign: "",
       title: "",
       subtitle: "",
       contents: "",
@@ -187,19 +202,31 @@ function App() {
       parent: data.currentParent.id,
     };
 
-    setEditItem(newItem);
-
-    toggleEditor();
+    setEditData({ item: JSON.parse(JSON.stringify(newItem)), isEditing: true });
   };
 
   const handleEditItem = (selectedItem) => {
-    setEditItem(selectedItem);
-
-    toggleEditor();
+    setEditData({
+      item: JSON.parse(JSON.stringify(selectedItem)),
+      isEditing: true,
+    });
   };
 
   const handleEditorSubmit = (editItem) => {
     toggleEditor();
+
+    // Check if there is a '+' or '*' sign in mkb_code
+    const lastChar = editItem.mkb_code.slice(-1);
+
+    console.log(lastChar);
+
+    if ("+*".includes(lastChar)) {
+      editItem.mkb_code = editItem.mkb_code.slice(0, -1);
+
+      editItem.sign = lastChar;
+    } else {
+      editItem.sign = "";
+    }
 
     // Set current scroll position
     sessionStorage.setItem("scrollPosition", window.pageYOffset);
@@ -215,6 +242,7 @@ function App() {
         refreshItems(data.currentParent);
       })
       .then(() => {
+        setJumpPosition("anchor-at-" + editItem.mkb_code);
         utils.scrollToLastPosition();
       })
       .catch((error) => {
@@ -277,7 +305,7 @@ function App() {
         />
 
         <a
-          id="top-pos"
+          id="top"
           className="anchor"
           href="/#"
           style={{ scrollMarginTop: navTreeHeight }}
@@ -296,7 +324,7 @@ function App() {
 
         {modal ? (
           <EditorModal
-            editItem={editItem}
+            editItem={editData.item}
             submitHandler={handleEditorSubmit}
             toggle={toggleEditor}
           />

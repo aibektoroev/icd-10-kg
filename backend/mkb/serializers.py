@@ -11,7 +11,7 @@ class MKBRecordSerializer(serializers.ModelSerializer):
 class MKBSearchSerializer(serializers.ModelSerializer):
     class Meta:
         model = MKBRecord
-        fields = ['id', 'mkb_code', 'title']
+        fields = ['id', 'mkb_code', 'sign', 'title']
 
 
 class AlphabetCategorySerializer(serializers.ModelSerializer):

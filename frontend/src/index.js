@@ -5,7 +5,9 @@ import { Route, Routes, BrowserRouter as Router } from "react-router-dom";
 import App from "./App";
 import Login from "./components/login";
 import Logout from "./components/logout";
-import Alphabet from "./components/alphabets";
+import AlphabetCategories from "./components/alphabet-categories";
+import AlphabetGroups from "./components/alphabet-groups";
+import Alphabets from "./components/alphabets";
 import AppContext from "./context";
 //import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
 
@@ -27,6 +29,7 @@ function Main() {
               }
             />
             <Route
+              exact
               path="/login"
               element={
                 <AppContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>
@@ -34,8 +37,18 @@ function Main() {
                 </AppContext.Provider>
               }
             />
-            <Route path="/logout" element={<Logout />} />
-            {/*<Route path="/alphabet" element={<Alphabet />} />*/}
+            <Route exact path="/logout" element={<Logout />} />
+            <Route exact path="/alphabet" element={<AlphabetCategories />} />
+            <Route
+              exact
+              path="/alphabet/:cat_id"
+              element={<AlphabetGroups />}
+            />
+            <Route
+              exact
+              path="/alphabet/:cat_id/:group_id"
+              element={<Alphabets />}
+            />
           </Routes>
         </React.StrictMode>
       </Router>

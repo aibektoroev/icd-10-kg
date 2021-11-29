@@ -6,6 +6,8 @@ export default function NavTree(props) {
   const { isLoggedIn } = useContext(AppContext);
 
   const generatedNodes = (nodes) => {
+    const lastNode = nodes.at(-1);
+
     return nodes
       .slice(0, -1)
       .map((node) => (
@@ -14,10 +16,14 @@ export default function NavTree(props) {
           key={node.id}
           onClick={(e) => props.onTreeNodeClicked(e, node)}
         >
-          {node.mkb_code}
+          {node.mkb_code + (node.sign ? node.sign : "")}
         </a>
       ))
-      .concat(<span key={nodes.at(-1).id}>{nodes.at(-1).mkb_code}</span>);
+      .concat(
+        <span key={lastNode.id}>
+          {lastNode.mkb_code + (lastNode.sign ? lastNode.sign : "")}
+        </span>
+      );
   };
 
   return (

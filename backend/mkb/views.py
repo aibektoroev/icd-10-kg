@@ -14,7 +14,7 @@ class FilterByParent(viewsets.ModelViewSet):
 
     def list(self, request):
 
-        parents = [{ "id": 0, "mkb_code": "МКБ-10", "title": "Классы" }]
+        parents = [{ "id": 0, "mkb_code": "МКБ-10", "sign": "", "title": "Классы" }]
 
         parent = int(request.query_params.get('parent'))
 
@@ -23,7 +23,7 @@ class FilterByParent(viewsets.ModelViewSet):
 
             while parent:
                 parent_record = MKBRecord.records.get(id=parent)
-                parents.insert(1, {"id": parent_record.id, "mkb_code": parent_record.mkb_code, "title": parent_record.title})
+                parents.insert(1, {"id": parent_record.id, "mkb_code": parent_record.mkb_code, "sign": parent_record.sign, "title": parent_record.title})
                 parent = parent_record.parent            
         
             return Response(data={"parents": parents,
@@ -64,7 +64,9 @@ class ParentByCode(viewsets.ModelViewSet):
 
         processed_code = target_record.mkb_code
 
-        parent = { "id": parent.id, "mkb_code": parent.mkb_code, "title": parent.title }
+        parent = { "id": parent.id, "mkb_code": parent.mkb_code, "sign": parent.sign, "title": parent.title }
+
+        print("Parent", parent)
             
         return Response(data={"processed_code": processed_code,
                             "parent": parent},
@@ -74,8 +76,9 @@ class ParentByCode(viewsets.ModelViewSet):
 class LiveSearchView(generics.ListAPIView):
     queryset = MKBRecord.records.all()
     serializer_class = MKBSearchSerializer
-    filter_backends = (filters.SearchFilter,)
+    filter_backends = (filters.SearchFilter, filters.OrderingFilter,)    
     search_fields = ['mkb_code', 'title']
+    ordering = 'mkb_code'
 
 
 class RecordsViewSet(viewsets.ModelViewSet):

@@ -1,22 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 import axiosInstance from "../axios";
 import "./styles/alphabet.css";
 
-export default function Alphabets() {
-  const { group_id } = useParams();
+export default function AlphabetCategories() {
+  const [categories, setCategories] = useState([]);
 
-  const [items, setItems] = useState([]);
+  const navigate = useNavigate();
 
-  async function loadItems(group_id) {
+  async function loadCategories() {
     await axios
-      .get(process.env.REACT_APP_API_URL + "alphabets", {
-        params: { group: group_id },
-      })
+      .get(process.env.REACT_APP_API_URL + "alphabet_categories")
       .then((res) => {
-        setItems(res.data.alphabets);
+        setCategories(res.data);
       })
       .catch((error) => {
         Swal.fire({
@@ -28,10 +26,8 @@ export default function Alphabets() {
   }
 
   useEffect(() => {
-    loadItems(group_id);
+    loadCategories();
   }, []);
-
-  /*
 
   const handleTestCreateItem = (e) => {
     e.preventDefault();
@@ -45,7 +41,7 @@ export default function Alphabets() {
     axiosInstance
       .post(`alphabet_categories/`, item)
       .then((res) => {
-        loadGroups(cat_id);
+        loadCategories();
       })
       .catch((error) => {
         Swal.fire({
@@ -56,25 +52,35 @@ export default function Alphabets() {
       });
   };
 
-  */
-
-  const groupClickedHandler = (e) => {
+  const categoryClickedHandler = (e, category) => {
     e.preventDefault();
+    // pass the selected category item to route /alphabet/:category
+
+    navigate(`/alphabet/${category.id}`);
+
+    console.log(category.id);
   };
 
   return (
     <React.Fragment>
       <div className="wrapper">
         <div className="card">
-          <div className="card-header text-center">Аб-Ад</div>
+          <div className="card-header text-center">
+            Алфавитные указатели МКБ-10
+          </div>
           <ul className="list-group list-group-flush">
-            {items.map((item) => {
+            {categories.map((category) => {
               return (
-                <li key={item.id} className="list-group-item">
-                  <a href="/#" onClick={groupClickedHandler}>
-                    {item.phrase}
+                <li key={category.id} className="list-group-item">
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      categoryClickedHandler(e, category);
+                    }}
+                  >
+                    {category.name}
                   </a>
-                  <pre className="text-description">{item.details}</pre>
+                  <pre className="text-description">{category.details}</pre>
                 </li>
               );
             })}
