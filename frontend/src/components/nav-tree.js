@@ -1,9 +1,18 @@
 import React, { useContext } from "react";
+import { useNavigate } from "react-router";
 import "./styles/navtree.css";
 import AppContext from "../context";
 
 export default function NavTree(props) {
   const { isLoggedIn } = useContext(AppContext);
+
+  const navigate = useNavigate();
+
+  const handleTreeNodeClicked = (e, node) => {
+    e.preventDefault();
+
+    navigate(`/page/${node.id}`);
+  };
 
   const generatedNodes = (nodes) => {
     const lastNode = nodes.at(-1);
@@ -12,9 +21,9 @@ export default function NavTree(props) {
       .slice(0, -1)
       .map((node) => (
         <a
-          href="/#"
+          href={`/page/${node.id}`}
           key={node.id}
-          onClick={(e) => props.onTreeNodeClicked(e, node)}
+          onClick={(e) => handleTreeNodeClicked(e, node)}
         >
           {node.mkb_code + (node.sign ? node.sign : "")}
         </a>

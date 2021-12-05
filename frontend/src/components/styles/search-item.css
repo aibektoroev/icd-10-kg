@@ -1,4 +1,6 @@
 .searchItem {
+  display: block;
+  text-decoration: none;
   padding: 5px;
   border-width: 1px;
   border-style: solid;
@@ -6,7 +8,6 @@
   border-color: white white lightgrey white;
   height: auto;
   align-items: center;
-  color: rgb(55, 55, 55);
   font-size: 13px;
   cursor: pointer;
 }
@@ -16,14 +17,18 @@
   border-radius: 3px;
   padding: 0px 3px;
   background-color: #555555;
-  color: #ffffff;
+  color: white;
 }
 
 .mkbTitle {
   margin-left: 3px;
+  color: rgb(55, 55, 55);
 }
 
 .searchItem:hover {
   background-color: #41b8e7;
-  color: white;
+}
+
+.searchItem:hover .mkbTitle {
+  color: white !important;
 }

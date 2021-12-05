@@ -59,7 +59,9 @@ export default function NavBar(props) {
   };
 
   const handleSearchItemClicked = (e, mkb_code) => {
-    props.searchItemClickedHandler(e, mkb_code);
+    e.preventDefault();
+
+    navigate(`/code/${mkb_code}`);
 
     unexpandIfMobileView();
   };
@@ -83,7 +85,7 @@ export default function NavBar(props) {
           <Navbar.Collapse id="nav-items">
             <Nav className="container-fluid justify-content-end align-items-md-center">
               <Nav.Link
-                href="/#"
+                href="/alphabet"
                 className="nav-item"
                 onClick={onAlphabetsClicked}
               >

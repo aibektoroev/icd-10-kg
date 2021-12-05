@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import NavBar from "./components/nav-bar";
 import NavTree from "./components/nav-tree";
 import MKBList from "./components/mkb-list";
@@ -8,13 +8,15 @@ import axios from "axios";
 import axiosInstance from "./axios";
 import Swal from "sweetalert2";
 import utils from "./utils";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import AppContext from "./context";
 
 function App() {
   // #region ----------------- Variables and States ------------------------
 
   const { setIsLoggedIn } = useContext(AppContext);
+
+  const { page, pid } = useParams();
 
   const navigate = useNavigate();
 
@@ -42,13 +44,20 @@ function App() {
     isEditing: false,
   });
 
-  const [jumpPosition, setJumpPosition] = useState("top");
+  const [scrollPosition, setScrollPosition] = useState("top");
+
+  const scrollRefs = useRef({});
 
   // #endregion
 
-  async function refreshItems(parent) {
-    // if (parent === currentParent) return;   // TEST THIS LATER !!!
+  const scrollTo = (refName) => {
+    scrollRefs.current &&
+      scrollRefs.current[refName] &&
+      scrollRefs.current[refName].scrollIntoView();
+  };
 
+  // refresh list of items for the given parent record (get it's child records)
+  async function loadChildItemsOf(parent) {
     await axios
       .get(process.env.REACT_APP_API_URL + "filterbyparent", {
         params: { parent: parent.id },
@@ -69,68 +78,42 @@ function App() {
       });
   }
 
-  useEffect(() => {
-    // On component did mount do:
-    // 1. Check tokens expiration: if expired then set isLoggedIn state to false, else to true
-    // 2. Load initial data
+  // Loads content for the given page id (which is actually the parent record's id)
+  async function loadPage(page_id) {
+    setScrollPosition("top");
 
-    // Check tokens expiration
-    const token = utils.getToken();
+    let parent = null;
 
-    setIsLoggedIn(token.valid);
-
-    // Load initial data
-    const loadInitialData = async () => {
-      setJumpPosition("top");
-
-      await refreshItems(rootParent);
-    };
-
-    loadInitialData();
-
-    // eslint-disable-next-line
-  }, []);
-
-  useEffect(() => {
-    // calculate current top offset
-    const topOffset = document.getElementById("nav-tree").clientHeight + 56;
-
-    if (navTreeHeight === topOffset) {
-      utils.jumpto(jumpPosition);
-    } else setNavTreeHeight(topOffset);
-  }, [data]);
-
-  useEffect(() => {
-    utils.jumpto(jumpPosition);
-  }, [navTreeHeight]);
-
-  async function titleClickedHandler(selectedItem) {
-    if (selectedItem.id === data.treeNodes.at(-1).id) {
-      return;
+    if (page_id && page_id > 0) {
+      // get record by id and set it to parent
+      await axios
+        .get(process.env.REACT_APP_API_URL + `records/${page_id}`)
+        .then((res) => {
+          parent = res.data;
+        })
+        .catch((error) => {
+          Swal.fire({
+            icon: "error",
+            title: "Что-то пошло не так...",
+            html: `<p>${error.message}</p>`,
+          });
+        });
+    } else {
+      parent = rootParent;
     }
 
-    setJumpPosition("top");
-
-    await refreshItems(selectedItem);
+    // refresh list of items for the given parent record (get it's child records)
+    loadChildItemsOf(parent);
   }
 
-  async function treeNodeClickedHandler(e, node) {
-    e.preventDefault();
-
-    setJumpPosition("top");
-
-    await refreshItems(node);
-  }
-
-  async function embeddedLinkClickedHandler(e, link) {
-    e.preventDefault();
-
+  // Loads the page containing the given mkb code and navigates to it
+  async function navigateToCode(code) {
     let processed_code = "";
     let parent = null;
 
     await axios
       .get(process.env.REACT_APP_API_URL + "getparentbycode", {
-        params: { mkb_code: link },
+        params: { mkb_code: code },
       })
       .then((res) => {
         if (res.status === 204) {
@@ -158,19 +141,68 @@ function App() {
 
     if (!processed_code || !parent) return;
 
-    setJumpPosition("anchor-at-" + processed_code);
+    setScrollPosition(processed_code);
 
     // Refresh list with new items
-    await refreshItems(parent).then(() => {
+    await loadChildItemsOf(parent).then(() => {
       // Make some animation effect on the target item
       let targetItem = document.getElementById("item-" + processed_code);
       utils.animateTargetItem(targetItem);
     });
   }
 
-  function handleSearchItemClicked(e, mkb_code) {
-    embeddedLinkClickedHandler(e, mkb_code);
-  }
+  useEffect(() => {
+    // On component did mount do:
+    // 1. Check tokens expiration: if expired then set isLoggedIn state to false, else to true
+
+    // Check tokens expiration
+    const token = utils.getToken();
+
+    setIsLoggedIn(token.valid);
+
+    // eslint-disable-next-line
+  }, []);
+
+  useEffect(() => {
+    const handleRequest = async () => {
+      if (!page || !pid) {
+        loadPage(0);
+        return;
+      }
+
+      switch (page) {
+        case "page": // if caller requested for a page
+          loadPage(pid);
+          break;
+
+        case "code": // if caller requested for an mkb code
+          navigateToCode(pid);
+          break;
+
+        default:
+          break;
+      }
+    };
+
+    handleRequest();
+
+    // DEBUG logs
+    console.log("The pid has changed and it's value is : " + pid);
+    console.log("page is : " + page + " pid is : " + pid);
+  }, [pid]);
+
+  useEffect(() => {
+    // calculate current top offset
+    const topOffset = document.getElementById("nav-tree").clientHeight + 56;
+
+    if (navTreeHeight === topOffset) {
+      scrollTo(scrollPosition);
+    } else setNavTreeHeight(topOffset);
+  }, [data]);
+
+  useEffect(() => {
+    scrollTo(scrollPosition);
+  }, [navTreeHeight]);
 
   //#region ----------------- EDITOR HANDLING FUNCS ------------------------
 
@@ -218,8 +250,6 @@ function App() {
     // Check if there is a '+' or '*' sign in mkb_code
     const lastChar = editItem.mkb_code.slice(-1);
 
-    console.log(lastChar);
-
     if ("+*".includes(lastChar)) {
       editItem.mkb_code = editItem.mkb_code.slice(0, -1);
 
@@ -239,10 +269,10 @@ function App() {
 
     request()
       .then((res) => {
-        refreshItems(data.currentParent);
+        loadChildItemsOf(data.currentParent);
       })
       .then(() => {
-        setJumpPosition("anchor-at-" + editItem.mkb_code);
+        setScrollPosition(editItem.mkb_code);
         utils.scrollToLastPosition();
       })
       .catch((error) => {
@@ -294,30 +324,27 @@ function App() {
   return (
     <React.Fragment>
       <div id="wrapper">
-        <NavBar searchItemClickedHandler={handleSearchItemClicked} />
+        <NavBar />
 
         <NavTree
           id="nav-tree"
           parent={data.currentParent}
           nodes={data.treeNodes}
-          onTreeNodeClicked={treeNodeClickedHandler}
           onAddItemClicked={handleAddItem}
         />
 
-        <a
-          id="top"
-          className="anchor"
-          href="/#"
+        <span
+          className="scroll-pos"
           style={{ scrollMarginTop: navTreeHeight }}
+          ref={(el) => (scrollRefs.current.top = el)}
         />
         {data.currentParent.mkb_code.includes(".") ? (
           <MKBItemDetailed />
         ) : (
           <MKBList
             items={data.items}
+            scrollRefs={scrollRefs}
             navTreeHeight={navTreeHeight}
-            onTitleClicked={titleClickedHandler}
-            onEmbeddedLinkClicked={embeddedLinkClickedHandler}
             editItemHandler={handleEditItem}
           />
         )}

@@ -1,15 +1,11 @@
+import EmbeddedLink from "./components/embedded-link";
+
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 const utils = {
-  jumpto: function (anchor) {
-    window.location.href = "#" + anchor;
-    console.log("----------- JUMPED!!!------------ to " + anchor);
-  },
-
   //Make some animation effect on the target item
-
   animateTargetItem: async function (targetItem) {
     for (let i = 0; i < 3; i++) {
       targetItem.classList.toggle("mkb-title-fade");
@@ -26,8 +22,6 @@ const utils = {
       window.scrollTo(0, parseInt(scrollPos));
       sessionStorage.removeItem("scrollPosition");
     }
-
-    console.log("Scrolled back to last postition...");
   },
 
   getToken: function () {
@@ -44,6 +38,37 @@ const utils = {
     }
 
     return { token: refreshToken, valid: tokenValid };
+  },
+
+  // Takes a text and makes mkb-codes found in it clickable
+  parseMKBCodesInText: function (text) {
+    if (text.length < 4) return text;
+
+    text = text + " ";
+    const pattern =
+      /\b[A-Z]{1}\d{2}-[A-Z]{1}\d{2}\b|\b[A-Z]{1}\d{2}\.\d{1}[+*]?\b|\b[A-Z]{1}\d{2}[+*]?\b/g;
+
+    const mkb_codes = Array.from(text.matchAll(pattern));
+
+    const elements = [];
+
+    let [left, right] = ["", text];
+
+    mkb_codes.forEach((code, index) => {
+      code = code[0];
+
+      const split_pos = right.indexOf(code);
+
+      left = right.substring(0, split_pos);
+      right = right.substring(split_pos + code.length);
+
+      elements.push(<span key={"" + index + 1}>{left}</span>);
+      elements.push(<EmbeddedLink key={"" + index + 2} mkb_code={code} />);
+    });
+
+    elements.push(<span key={"last_elem"}>{right}</span>);
+
+    return elements;
   },
 };
 

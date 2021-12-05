@@ -14,13 +14,26 @@ import AppContext from "./context";
 function Main() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  const [currentAlphabet, setCurrentAlphabet] = useState({
+    category: null,
+    group: null,
+  });
+
   return (
     <React.Fragment>
       <Router>
         <React.StrictMode>
           <Routes>
             <Route
-              exact
+              path="/:page/:pid"
+              element={
+                <AppContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>
+                  <App />
+                </AppContext.Provider>
+              }
+            />
+
+            <Route
               path="/"
               element={
                 <AppContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>
@@ -28,8 +41,8 @@ function Main() {
                 </AppContext.Provider>
               }
             />
+
             <Route
-              exact
               path="/login"
               element={
                 <AppContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>
@@ -37,17 +50,39 @@ function Main() {
                 </AppContext.Provider>
               }
             />
-            <Route exact path="/logout" element={<Logout />} />
-            <Route exact path="/alphabet" element={<AlphabetCategories />} />
+
+            <Route path="/logout" element={<Logout />} />
+
             <Route
-              exact
+              path="/alphabet"
+              element={
+                <AppContext.Provider
+                  value={{ currentAlphabet, setCurrentAlphabet }}
+                >
+                  <AlphabetCategories />
+                </AppContext.Provider>
+              }
+            />
+
+            <Route
               path="/alphabet/:cat_id"
-              element={<AlphabetGroups />}
+              element={
+                <AppContext.Provider
+                  value={{ currentAlphabet, setCurrentAlphabet }}
+                >
+                  <AlphabetGroups />
+                </AppContext.Provider>
+              }
             />
             <Route
-              exact
               path="/alphabet/:cat_id/:group_id"
-              element={<Alphabets />}
+              element={
+                <AppContext.Provider
+                  value={{ currentAlphabet, setCurrentAlphabet }}
+                >
+                  <Alphabets />
+                </AppContext.Provider>
+              }
             />
           </Routes>
         </React.StrictMode>

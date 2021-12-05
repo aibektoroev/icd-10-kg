@@ -3,9 +3,8 @@ import OutsideClickHandler from "react-outside-click-handler";
 import SearchItem from "./search-item";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
-import { search } from "../api";
+import { search } from "./search-api";
 import "./styles/search-bar.css";
-import { height } from "@mui/system";
 
 function SearchBar(props) {
   const [inputGotFocus, setInputGotFocus] = useState(false);
@@ -52,10 +51,7 @@ function SearchBar(props) {
 
     search(keyword)
       .then((res) => {
-        if (res.data) {
-          setSearchResults(res.data);
-          //showSearchResults();
-        } //else setSearchResults([]);
+        res.data && setSearchResults(res.data);
       })
       .catch(function (error) {
         if (error.response) {

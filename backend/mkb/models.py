@@ -13,6 +13,9 @@ class MKBRecord(models.Model):
 
     records = models.Manager()
 
+    def __str__(self):
+        return "{}: {} - {}".format(self.id, self.mkb_code, self.title)
+
     class Meta:
         managed = True
         db_table = 'MKBRecord'
@@ -23,6 +26,9 @@ class AlphabetCategory(models.Model):
     details = models.TextField(blank=True, null=True)
 
     categories = models.Manager()
+
+    def __str__(self):
+        return "{}: {}".format(self.id, self.name)
 
     class Meta:
         managed = True
@@ -35,6 +41,9 @@ class AlphabetGroup(models.Model):
 
     groups = models.Manager()
 
+    def __str__(self):
+        return "{}: {}".format(self.id, self.name)
+
     class Meta:
         managed = True
         db_table = 'AlphabetGroup'
@@ -46,6 +55,9 @@ class Alphabet(models.Model):
     details = models.TextField(blank=True, null=True)
 
     alphabets = models.Manager()
+    
+    def __str__(self):
+        return "{}: {}".format(self.id, self.phrase)
 
     class Meta:
         managed = True

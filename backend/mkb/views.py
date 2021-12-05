@@ -65,8 +65,6 @@ class ParentByCode(viewsets.ModelViewSet):
         processed_code = target_record.mkb_code
 
         parent = { "id": parent.id, "mkb_code": parent.mkb_code, "sign": parent.sign, "title": parent.title }
-
-        print("Parent", parent)
             
         return Response(data={"processed_code": processed_code,
                             "parent": parent},
@@ -82,43 +80,53 @@ class LiveSearchView(generics.ListAPIView):
 
 
 class RecordsViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    #permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = MKBRecordSerializer
     queryset = MKBRecord.records.all()
 
 
-class AlphabetViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticatedOrReadOnly]
-    serializer_class = AlphabetSerializer
-    
-    def list(self, request):
 
-        group = int(request.query_params.get('group'))
-
-        alphabets = Alphabet.alphabets.filter(group=group).order_by("phrase").values()
-
-        return Response(data={"alphabets": alphabets},
-                                status=status.HTTP_200_OK)
+class AlphabetCategoryViewSet(viewsets.ModelViewSet):
+    #permission_classes = [IsAuthenticatedOrReadOnly]
+    serializer_class = AlphabetCategorySerializer
+    queryset = AlphabetCategory.categories.all()
 
 
 class AlphabetGroupViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    #permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = AlphabetGroupSerializer
     
     def list(self, request):
 
-        category = int(request.query_params.get('category'))
+        cat_id = int(request.query_params.get('category'))
 
-        groups = AlphabetGroup.groups.filter(category=category).order_by("name").values()
+        category = AlphabetCategory.categories.get(id=cat_id)
 
-        return Response(data={"groups": groups},
+        groups = AlphabetGroup.groups.filter(category=category.id).order_by("name").values()
+
+        category = AlphabetCategorySerializer(category).data
+
+        return Response(data={"category": category, "groups": groups},
                                 status=status.HTTP_200_OK)
 
 
-class AlphabetCategoryViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticatedOrReadOnly]
-    serializer_class = AlphabetCategorySerializer
-    queryset = AlphabetCategory.categories.all()
+class AlphabetViewSet(viewsets.ModelViewSet):
+    #permission_classes = [IsAuthenticatedOrReadOnly]
+    serializer_class = AlphabetSerializer
+    
+    def list(self, request):
+
+        group_id = int(request.query_params.get('group'))
+
+        group = AlphabetGroup.groups.get(id=group_id)
+
+        alphabets = Alphabet.alphabets.filter(group=group).order_by("id").values()
+
+        group = AlphabetGroupSerializer(group).data
+
+        return Response(data={"group": group, "alphabets": alphabets},
+                                status=status.HTTP_200_OK)
+
 
 
 class BlacklistTokenUpdateView(views.APIView):

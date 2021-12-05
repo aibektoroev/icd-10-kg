@@ -15,11 +15,11 @@ body {
   max-width: 1080px;
 }
 
-a.anchor {
+span.scroll-pos {
   visibility: hidden;
 }
 
-.anchor:target {
+.scroll-pos:target {
   scroll-margin-top: 86px;
 }
 

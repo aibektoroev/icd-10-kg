@@ -11,18 +11,15 @@ export default function MKBList(props) {
           props.items.map((item) => (
             <li key={item.id} className="list-group-item rounded m-0 p-1">
               {/* eslint-disable-next-line */}
-              <a
-                id={"anchor-at-" + item.mkb_code}
-                className="anchor"
-                href="/#"
+              <span
+                className="scroll-pos"
                 style={{ scrollMarginTop: props.navTreeHeight }}
+                ref={(el) =>
+                  (props.scrollRefs.current[String(item.mkb_code)] = el)
+                }
               />
-              <MKBItem
-                item={item}
-                onTitleClicked={props.onTitleClicked}
-                onEmbeddedLinkClicked={props.onEmbeddedLinkClicked}
-                editItemHandler={props.editItemHandler}
-              />
+
+              <MKBItem item={item} editItemHandler={props.editItemHandler} />
             </li>
           ))}
       </ol>
