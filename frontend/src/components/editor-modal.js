@@ -15,15 +15,6 @@ function EditorModal(props) {
 
   const [isFormValid, setFormValid] = useState(false);
 
-  /* TO DO :
-
-  + Implement data vlaidation !!!
-  + Check if editItem is changed !!!
-  + TEST: POST (new item): make it's id = 0
-  + TEST: PUT (existing item)
-  - TEST: if actual changed then set act_date to DateTime Now
-  */
-
   useEffect(() => {
     validateForm();
     // eslint-disable-next-line
@@ -68,8 +59,6 @@ function EditorModal(props) {
   }
 
   const handleChange = (e) => {
-    //e.preventDefault();
-
     let fieldName = e.target.name;
     let newValue = "";
 
@@ -158,16 +147,6 @@ function EditorModal(props) {
               name="subtitle"
               style={{ minHeight: 220 }}
               value={editItem.subtitle}
-              onChange={handleChange}
-            />
-          </FormGroup>
-
-          <FormGroup className="form-group">
-            <Form.Label className="text-secondary">Содержимое</Form.Label>
-            <Form.Control
-              as="textarea"
-              name="contents"
-              value={editItem.contents}
               onChange={handleChange}
             />
           </FormGroup>

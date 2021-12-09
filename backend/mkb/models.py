@@ -6,7 +6,6 @@ class MKBRecord(models.Model):
     sign = models.CharField(max_length=1, blank=True, null=True)
     title = models.TextField(blank=False, null=False)
     subtitle = models.TextField(blank=True, null=True)
-    contents = models.TextField(blank=True, null=True)
     actual = models.BooleanField(default=True)
     act_date = models.DateField(blank=True, null=True)
     parent = models.IntegerField(default=0, blank=False, null=False)

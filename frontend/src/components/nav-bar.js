@@ -22,8 +22,6 @@ export default function NavBar(props) {
 
     const handleResize = () => {
       setMobileView(window.innerWidth < 767);
-
-      //if (!mobileView && expanded) setExpanded(false);
     };
 
     window.addEventListener("resize", handleResize);

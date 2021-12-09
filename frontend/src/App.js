@@ -36,7 +36,6 @@ function App() {
       sign: "",
       title: "",
       subtitle: "",
-      contents: "",
       actual: true,
       act_date: null,
       parent: 0,
@@ -153,7 +152,7 @@ function App() {
 
   useEffect(() => {
     // On component did mount do:
-    // 1. Check tokens expiration: if expired then set isLoggedIn state to false, else to true
+    // Check tokens expiration: if expired then set isLoggedIn state to false, else to true
 
     // Check tokens expiration
     const token = utils.getToken();
@@ -228,7 +227,6 @@ function App() {
       sign: "",
       title: "",
       subtitle: "",
-      contents: "",
       actual: true,
       act_date: null, // use new Date() then .toISOString().slice(0, 10);
       parent: data.currentParent.id,
