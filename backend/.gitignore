@@ -1,1 +1,3 @@
 /backend/settings/development.py
+cmd_snippets.txt
+*.json

@@ -15,6 +15,7 @@ router.register(r'records', views.RecordsViewSet, 'record')
 router.register(r'alphabet_categories', views.AlphabetCategoryViewSet, 'alphabet_category')
 router.register(r'alphabet_groups', views.AlphabetGroupViewSet, 'alphabet_group')
 router.register(r'alphabets', views.AlphabetViewSet, 'alphabet')
+router.register(r'chemicals', views.ChemicalsViewSet, 'chemicals')
 
 
 urlpatterns = [

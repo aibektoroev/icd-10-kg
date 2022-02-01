@@ -8,6 +8,7 @@ import Logout from "./components/logout";
 import AlphabetCategories from "./components/alphabet-categories";
 import AlphabetGroups from "./components/alphabet-groups";
 import Alphabets from "./components/alphabets";
+import AlphabetStatic from "./static/alphabet-static";
 import AppContext from "./context";
 //import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
 
@@ -62,6 +63,11 @@ function Main() {
                   <AlphabetCategories />
                 </AppContext.Provider>
               }
+            />
+
+            <Route
+              path="/alphabet/static/:component_name/:group_id"
+              element={<AlphabetStatic />}
             />
 
             <Route

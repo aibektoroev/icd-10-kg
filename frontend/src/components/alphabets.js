@@ -42,9 +42,7 @@ export default function Alphabets() {
             {items.alphabets.map((alphabet) => {
               return (
                 <li key={alphabet.id} className="list-group-item">
-                  <h6>
-                    {alphabet.id}: {utils.parseMKBCodesInText(alphabet.phrase)}
-                  </h6>
+                  <h6>{utils.parseMKBCodesInText(alphabet.phrase)}</h6>
                   <pre className="text-description">
                     {utils.parseMKBCodesInText(alphabet.details)}
                   </pre>

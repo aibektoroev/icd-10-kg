@@ -35,7 +35,11 @@ export default function AlphabetGroups() {
   const groupClickedHandler = (e, group) => {
     e.preventDefault();
 
-    navigate(`/alphabet/${cat_id}/${group.id}`);
+    if (group.is_static) {
+      navigate(`/alphabet/static/${group.component}/${group.id}`);
+    } else {
+      navigate(`/alphabet/${cat_id}/${group.id}`);
+    }
   };
 
   return (
@@ -49,14 +53,25 @@ export default function AlphabetGroups() {
             {items.groups.map((group) => {
               return (
                 <li key={group.id} className="list-group-item">
-                  <a
-                    href={`/alphabet/${cat_id}/${group.id}`}
-                    onClick={(e) => {
-                      groupClickedHandler(e, group);
-                    }}
-                  >
-                    {group.id}: {group.name}
-                  </a>
+                  {group.is_static ? (
+                    <a
+                      href={`/alphabet/static/${group.component}/${group.id}`}
+                      onClick={(e) => {
+                        groupClickedHandler(e, group);
+                      }}
+                    >
+                      {group.name}
+                    </a>
+                  ) : (
+                    <a
+                      href={`/alphabet/${cat_id}/${group.id}`}
+                      onClick={(e) => {
+                        groupClickedHandler(e, group);
+                      }}
+                    >
+                      {group.name}
+                    </a>
+                  )}
                 </li>
               );
             })}

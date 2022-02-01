@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Alphabet, AlphabetCategory, AlphabetGroup, MKBRecord
+from .models import Alphabet, AlphabetCategory, AlphabetGroup, Chemicals, MKBRecord
 
 
 class MKBRecordSerializer(serializers.ModelSerializer):
@@ -29,4 +29,10 @@ class AlphabetGroupSerializer(serializers.ModelSerializer):
 class AlphabetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Alphabet
+        fields = '__all__'
+
+
+class ChemicalsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Chemicals
         fields = '__all__'

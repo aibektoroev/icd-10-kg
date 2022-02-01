@@ -36,7 +36,9 @@ class AlphabetCategory(models.Model):
 
 class AlphabetGroup(models.Model):
     category = models.ForeignKey(AlphabetCategory, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100, unique=True, blank=False, null=False)
+    name = models.CharField(max_length=100, unique=False, blank=False, null=False)
+    is_static = models.BooleanField(default=False)
+    component = models.CharField(max_length=50, unique=False, blank=True, null=True)
 
     groups = models.Manager()
 
@@ -61,3 +63,22 @@ class Alphabet(models.Model):
     class Meta:
         managed = True
         db_table = 'Alphabet'
+
+
+class Chemicals(models.Model):
+    group = models.ForeignKey(AlphabetGroup, on_delete=models.CASCADE)
+    name = models.CharField(max_length=250, blank=False, null=False)
+    code_1 = models.CharField(max_length=10)
+    code_2 = models.CharField(max_length=10)
+    code_3 = models.CharField(max_length=10)
+    code_4 = models.CharField(max_length=10)
+    code_5 = models.CharField(max_length=10)
+
+    chemicals = models.Manager()
+    
+    def __str__(self):
+        return "{}: {}".format(self.id, self.name)
+
+    class Meta:
+        managed = True
+        db_table = 'Chemicals'

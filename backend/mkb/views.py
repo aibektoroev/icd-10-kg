@@ -4,8 +4,8 @@ from rest_framework import viewsets, views
 from rest_framework import generics
 from rest_framework import filters
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from .models import AlphabetCategory, AlphabetGroup, Alphabet, MKBRecord
-from .serializers import AlphabetCategorySerializer, AlphabetGroupSerializer, AlphabetSerializer, MKBRecordSerializer, MKBSearchSerializer
+from .models import AlphabetCategory, AlphabetGroup, Alphabet, Chemicals, MKBRecord
+from .serializers import AlphabetCategorySerializer, AlphabetGroupSerializer, AlphabetSerializer, ChemicalsSerializer, MKBRecordSerializer, MKBSearchSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
@@ -82,7 +82,7 @@ class LiveSearchView(generics.ListAPIView):
 class RecordsViewSet(viewsets.ModelViewSet):
     #permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = MKBRecordSerializer
-    queryset = MKBRecord.records.all()
+    queryset = MKBRecord.records.all().order_by("id")
 
 
 
@@ -125,6 +125,24 @@ class AlphabetViewSet(viewsets.ModelViewSet):
         group = AlphabetGroupSerializer(group).data
 
         return Response(data={"group": group, "alphabets": alphabets},
+                                status=status.HTTP_200_OK)
+
+
+class ChemicalsViewSet(viewsets.ModelViewSet):
+    #permission_classes = [IsAuthenticatedOrReadOnly]
+    serializer_class = ChemicalsSerializer
+    
+    def list(self, request):
+
+        group_id = int(request.query_params.get('group'))
+
+        group = AlphabetGroup.groups.get(id=group_id)
+
+        chemicals = Chemicals.chemicals.filter(group=group).order_by("id").values()
+
+        group = AlphabetGroupSerializer(group).data
+
+        return Response(data={"group": group, "chemicals": chemicals},
                                 status=status.HTTP_200_OK)
 
 
